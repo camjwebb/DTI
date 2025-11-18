@@ -289,19 +289,19 @@
                 <button id="toggleBreakdown">Show Payment Breakdown ▼</button>
                 <div id="breakdownBox" class="dropdown-content">
                     <div class="dropdown-row">
-                        <span>Principal + Interest $</span><span id="bdPI" class="summary-value" data-edit="pi" data-type="currency">0</span>
+                        <span>Principal + Interest  </span><span id="bdPI" class="summary-value" data-edit="pi" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>Taxes $</span><span id="bdTaxes" class="summary-value" data-edit="taxes" data-type="currency">0</span>
+                        <span>Taxes</span><span id="bdTaxes" class="summary-value" data-edit="taxes" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>HOI $</span><span id="bdHOI" class="summary-value" data-edit="hoi" data-type="currency">0</span>
+                        <span>HOI  </span><span id="bdHOI" class="summary-value" data-edit="hoi" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>HOA $</span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
+                        <span>HOA  </span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>PMI $</span><span id="bdPMI" class="summary-value" data-edit="pmi" data-type="currency">0</span>
+                        <span>PMI  </span><span id="bdPMI" class="summary-value" data-edit="pmi" data-type="currency">0</span>
                     </div>
                 </div>
             </div>
@@ -310,32 +310,32 @@
 
             <!-- Editable Variables -->
             <div class="summary-row">
-                <span class="summary-label">Down Payment %</span>
+                <span class="summary-label">Down Payment  </span>
                 <span class="summary-value" data-edit="downPct" data-type="percent">5</span>
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Interest Rate %</span>
+                <span class="summary-label">Interest Rate  </span>
                 <span class="summary-value" data-edit="interestRate" data-type="percent">6</span>
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Loan Term (years)</span>
+                <span class="summary-label">Loan Term        </span>
                 <span class="summary-value" data-edit="termYears" data-type="years">30</span>
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Gross Income $</span>
+                <span class="summary-label">Gross Income  </span>
                 <span class="summary-value" data-edit="grossIncome" data-type="currency">0</span>
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Monthly Debt $</span>
+                <span class="summary-label">Monthly Debt  </span>
                 <span class="summary-value" data-edit="monthlyDebt" data-type="currency">0</span>
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">DTI %</span>
+                <span class="summary-label">DTI  </span>
                 <span class="summary-value" data-edit="dtiPct" data-type="percent">45</span>
             </div>
 
@@ -439,21 +439,21 @@ incomeInput.addEventListener("keydown", (e) => {
     }
 });
 
-// Autofocus income input when step1 becomes active
-const observer1 = new MutationObserver(() => {
-    if (step1.classList.contains("active")) {
-        incomeInput.focus();
-    }
-});
-observer1.observe(step1, { attributes: true, attributeFilter: ["class"] });
-if (step1.classList.contains("active")) {
-    incomeInput.focus();
-}
+// // Autofocus income input when step1 becomes active
+// const observer1 = new MutationObserver(() => {
+//     if (step1.classList.contains("active")) {
+//         incomeInput.focus();
+//     }
+// });
+// observer1.observe(step1, { attributes: true, attributeFilter: ["class"] });
+// if (step1.classList.contains("active")) {
+//     incomeInput.focus();
+// }
 
-backTo1.onclick = () => {
-    step2.classList.remove("active");
-    step1.classList.add("active");
-};
+// backTo1.onclick = () => {
+//     step2.classList.remove("active");
+//     step1.classList.add("active");
+// };
 
 function goToSummaryFunc() {
     const debtValue = parseCurrency(debtInput.value);
@@ -520,18 +520,18 @@ debtInput.addEventListener("keydown", (e) => {
     }
 });
 
-// Autofocus debt input when step2 becomes active
-const observer2 = new MutationObserver(() => {
-    if (step2.classList.contains("active")) {
-        debtInput.focus();
-    }
-});
-observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
+// // Autofocus debt input when step2 becomes active
+// const observer2 = new MutationObserver(() => {
+//     if (step2.classList.contains("active")) {
+//         debtInput.focus();
+//     }
+// });
+// observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
 
-backBtn.onclick = () => {
-    summary.classList.remove("active");
-    step2.classList.add("active");
-};
+// backBtn.onclick = () => {
+//     summary.classList.remove("active");
+//     step2.classList.add("active");
+// };
 
 /* ============================================================
    CALCULATION
