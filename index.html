@@ -450,10 +450,10 @@ incomeInput.addEventListener("keydown", (e) => {
 //     incomeInput.focus();
 // }
 
-// backTo1.onclick = () => {
-//     step2.classList.remove("active");
-//     step1.classList.add("active");
-// };
+backTo1.onclick = () => {
+    step2.classList.remove("active");
+    step1.classList.add("active");
+};
 
 function goToSummaryFunc() {
     const debtValue = parseCurrency(debtInput.value);
