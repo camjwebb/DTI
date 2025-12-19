@@ -92,9 +92,14 @@
             padding: 12px 14px;
             border-radius: 10px;
             border: 1px solid #d6d9e0;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             margin-bottom: 12px;
+        }
+        @media (min-width: 420px) {
+            input[type="text"] {
+                font-size: 18px;
+            }
         }
         input[type="text"]::placeholder {
             color: #9ca3af;
@@ -287,11 +292,11 @@
         STEP 1: INCOME
         ============================================================ -->
     <div id="step1" class="step active">
-        <h2>Your Income</h2>
-        <p class="sub">Enter your gross monthly income.</p>
+        <h2>Your Monthly Gross Income</h2>
+        <p class="sub">Enter your monthly income before taxes.</p>
 
         <label>Gross Monthly Income</label>
-        <input id="incomeInput" type="text" inputmode="decimal" placeholder="$5,000">
+        <input id="incomeInput" type="text" inputmode="numeric" placeholder="$5,000">
 
         <button class="btn-primary" id="goToStep2">Continue</button>
     </div>
@@ -304,7 +309,7 @@
         <p class="sub">Include all recurring monthly debt payments.</p>
 
         <label>Total Monthly Debt</label>
-        <input id="debtInput" type="text" inputmode="decimal" placeholder="$500">
+        <input id="debtInput" type="text" inputmode="numeric" placeholder="$500">
 
         <button class="btn-primary" id="goToSummary">See My Home Budget</button>
         <button class="btn-secondary" id="backTo1">Back</button>
@@ -853,29 +858,53 @@ function setupEditableFields() {
         el.addEventListener("focus", function() {
             originalValue = parseFloat(this.textContent.replace(/[^0-9.-]+/g, "")) || 0;
             let text = this.textContent.replace(/[^0-9.]/g, '');
-            
+            let formattedText = '';
+
             if (type === "percent") {
                 const numValue = parseFloat(text) || 0;
                 if (key === "downPct") {
-                    this.textContent = numValue.toFixed(1);
+                    formattedText = numValue.toFixed(1) + "%";
                 } else if (key === "interestRate") {
-                    this.textContent = numValue.toFixed(3);
+                    formattedText = numValue.toFixed(3) + "%";
                 } else if (key === "dtiPct") {
-                    this.textContent = numValue.toFixed(2);
+                    formattedText = numValue.toFixed(2) + "%";
                 } else {
-                    this.textContent = numValue.toString();
+                    formattedText = numValue.toString() + "%";
                 }
+            } else if (type === "currency") {
+                const numValue = parseFloat(text) || 0;
+                formattedText = "$" + numValue.toString();
+            } else if (type === "years") {
+                const numValue = parseFloat(text) || 0;
+                formattedText = numValue.toString() + " years";
             } else {
                 const numValue = parseFloat(text) || 0;
-                this.textContent = numValue.toString();
+                formattedText = numValue.toString();
             }
-            
+
+            this.textContent = formattedText;
+
             setTimeout(() => {
                 const range = document.createRange();
-                range.selectNodeContents(this);
                 const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
+                const textNode = this.firstChild;
+                if (textNode) {
+                    // Position cursor after prefix ($ sign) or at start
+                    const startPos = type === "currency" ? 1 : 0;
+                    range.setStart(textNode, startPos);
+
+                    // Select to before suffix (%, years) or end
+                    let endPos = formattedText.length;
+                    if (type === "percent") {
+                        endPos = formattedText.indexOf('%');
+                    } else if (type === "years") {
+                        endPos = formattedText.indexOf(' years');
+                    }
+                    range.setEnd(textNode, endPos);
+
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
             }, 0);
         });
         
@@ -884,18 +913,18 @@ function setupEditableFields() {
             let cleaned = text.replace(/[^0-9.]/g, '');
             const parts = cleaned.split('.');
             let finalText = '';
-            
+
             if (parts.length === 0) {
                 finalText = '';
             } else if (parts.length === 1) {
                 finalText = parts[0] || '';
-                if (text.trim().endsWith('.')) {
+                if (text.trim().replace(/[^0-9.]/g, '').endsWith('.')) {
                     finalText += '.';
                 }
             } else {
                 finalText = parts[0] || '';
                 let decimals = parts.slice(1).join('');
-                
+
                 if (key === "downPct") {
                     if (decimals.length > 1) decimals = decimals.substring(0, 1);
                 } else if (key === "interestRate") {
@@ -903,10 +932,19 @@ function setupEditableFields() {
                 } else if (key === "dtiPct") {
                     if (decimals.length > 2) decimals = decimals.substring(0, 2);
                 }
-                
+
                 finalText += '.' + decimals;
             }
-            
+
+            // Add suffix/prefix based on type
+            if (type === "currency") {
+                finalText = "$" + finalText;
+            } else if (type === "percent") {
+                finalText = finalText + "%";
+            } else if (type === "years") {
+                finalText = finalText + " years";
+            }
+
             if (finalText !== text) {
                 const sel = window.getSelection();
                 let cursorPos = finalText.length;
@@ -915,19 +953,24 @@ function setupEditableFields() {
                         const range = sel.getRangeAt(0);
                         if (range.startContainer === this || range.startContainer.parentNode === this) {
                             cursorPos = range.startOffset;
-                            if (finalText.includes('.') && !text.includes('.')) {
-                                cursorPos = finalText.indexOf('.') + 1;
-                            } else if (finalText.length !== text.length) {
-                                const diff = finalText.length - text.length;
-                                cursorPos = Math.max(0, Math.min(cursorPos + diff, finalText.length));
+
+                            // Adjust cursor position based on where numbers are
+                            const numStart = type === "currency" ? 1 : 0;
+                            const oldCleaned = text.replace(/[^0-9.]/g, '');
+                            const newCleaned = finalText.replace(/[^0-9.]/g, '');
+
+                            if (oldCleaned.includes('.') !== newCleaned.includes('.')) {
+                                cursorPos = numStart + newCleaned.indexOf('.') + 1;
+                            } else {
+                                // Keep cursor in number portion
+                                cursorPos = Math.max(numStart, Math.min(cursorPos, numStart + newCleaned.length));
                             }
-                            cursorPos = Math.max(0, Math.min(cursorPos, finalText.length));
                         }
                     } catch(e) {}
                 }
-                
+
                 this.textContent = finalText;
-                
+
                 setTimeout(() => {
                     try {
                         const range = document.createRange();
@@ -986,8 +1029,10 @@ setupEditableFields();
 
 // Allow clicking anywhere to blur/submit editable fields, and prevent unwanted focus
 document.addEventListener('mousedown', function(e) {
-    // If clicking on a contenteditable element, allow it
-    if (e.target.hasAttribute('contenteditable')) {
+    // Allow clicking on inputs, buttons, and contenteditable elements
+    if (e.target.hasAttribute('contenteditable') ||
+        e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'BUTTON') {
         return;
     }
 
@@ -996,8 +1041,10 @@ document.addEventListener('mousedown', function(e) {
         document.activeElement.blur();
     }
 
-    // Prevent focus on anything that's not contenteditable
-    if (!e.target.hasAttribute('contenteditable')) {
+    // Prevent focus on anything that's not an input, button, or contenteditable
+    if (!e.target.hasAttribute('contenteditable') &&
+        e.target.tagName !== 'INPUT' &&
+        e.target.tagName !== 'BUTTON') {
         e.preventDefault();
     }
 });
