@@ -19,6 +19,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-y: scroll;
         }
         body * {
             cursor: inherit;
@@ -132,18 +133,6 @@
         /* ============================================================
            SUMMARY PAGE
            ============================================================ */
-        .big-number {
-            font-size: 9vw;
-            font-weight: 900;
-            text-align: center;
-            margin-bottom: 2vh;
-            color: #0b2345;
-        }
-        @media (min-width: 420px) {
-            .big-number {
-                font-size: 34px;
-            }
-        }
 
         .section-box {
             background: white;
@@ -183,16 +172,21 @@
             outline: none;
             text-align: right;
         }
+        #purchaseBig,
         #sumLoan,
         #sumDown,
         #sumMonthly {
             text-align: right;
             max-width: 150px;
         }
+        #purchaseBig:hover,
         #sumLoan:hover,
         #sumDown:hover,
         #sumMonthly:hover {
             color: inherit;
+        }
+        .summary-value[data-edit] {
+            font-style: italic;
         }
         .summary-value[data-edit]:hover {
             color: #2563eb;
@@ -212,6 +206,9 @@
             display: inline-block;
             outline: none;
             text-align: right;
+        }
+        .dropdown-row span:last-child {
+            font-style: italic;
         }
         .dropdown-row span:last-child:hover {
             color: #2563eb;
@@ -280,6 +277,87 @@
                 font-size: 12px;
             }
         }
+
+        /* Explanation Mode Button */
+        .explanation-toggle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 0;
+            background: #e9edf5;
+            color: #0b2345;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 9px;
+            border: none;
+            cursor: pointer;
+            width: auto;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .explanation-toggle:hover {
+            background: #d9dee8;
+        }
+
+        /* Big number container for positioning */
+        .big-number-container {
+            position: relative;
+            display: block;
+            width: 100%;
+            min-height: 20px;
+        }
+
+        /* Explanation text styles */
+        .explanation-text {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        .explanation-label {
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        /* Hide elements in explanation mode */
+        .hide-in-explanation {
+            display: none;
+        }
+
+        /* Section box relative positioning for button */
+        .section-box {
+            position: relative;
+        }
+
+        /* Explanation dropdown styles */
+        .explanation-section {
+            margin-bottom: 12px;
+        }
+        .explanation-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 12px;
+            margin-bottom: 0;
+            color: #0b2345;
+            cursor: pointer;
+            user-select: none;
+        }
+        .explanation-section h3:hover {
+            color: #2563eb;
+        }
+        .explanation-section h3:first-of-type {
+            margin-top: 12px;
+        }
+        .explanation-section h3:not(:first-of-type) {
+            margin-top: 20px;
+        }
+        .explanation-dropdown-content {
+            display: none;
+            padding-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -292,10 +370,10 @@
         STEP 1: INCOME
         ============================================================ -->
     <div id="step1" class="step active">
-        <h2>Your Monthly Gross Income</h2>
-        <p class="sub">Enter your monthly income before taxes.</p>
+        <h2>Your Monthly Income</h2>
+        <p class="sub">Enter your income before taxes and deductions</p>
 
-        <label>Gross Monthly Income</label>
+        <label>Monthly Income (before taxes)</label>
         <input id="incomeInput" type="text" inputmode="numeric" placeholder="$5,000">
 
         <button class="btn-primary" id="goToStep2">Continue</button>
@@ -305,13 +383,13 @@
         STEP 2: DEBT
         ============================================================ -->
     <div id="step2" class="step">
-        <h2>Your Monthly Debt</h2>
-        <p class="sub">Include all recurring monthly debt payments.</p>
+        <h2>Your Monthly Debt Payments</h2>
+        <p class="sub">Car loans, student loans, credit card minimums, and other debt payments (don't include rent or utilities)</p>
 
         <label>Total Monthly Debt</label>
         <input id="debtInput" type="text" inputmode="numeric" placeholder="$500">
 
-        <button class="btn-primary" id="goToSummary">See My Home Budget</button>
+        <button class="btn-primary" id="goToSummary">What can I afford?</button>
         <button class="btn-secondary" id="backTo1">Back</button>
     </div>
 
@@ -320,11 +398,18 @@
         ============================================================ -->
     <div id="summary" class="step">
 
-        <!-- BIG HOME VALUE NUMBER -->
-        <div id="purchaseBig" class="big-number">$0</div>
+        <!-- Definitions Button Container -->
+        <div class="big-number-container">
+            <button class="explanation-toggle" id="explanationToggle">Definitions</button>
+        </div>
 
         <!-- Loan Amount + Monthly Payment -->
         <div class="section-box">
+
+            <div class="summary-row">
+                <span class="summary-label">Purchase Price</span>
+                <span id="purchaseBig" class="summary-value">$0</span>
+            </div>
 
             <div class="summary-row">
                 <span class="summary-label">Loan Amount</span>
@@ -349,16 +434,16 @@
                         <span>Principal + Interest  </span><span id="bdPI" class="summary-value" data-edit="pi" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>Taxes</span><span id="bdTaxes" class="summary-value" data-edit="taxes" data-type="currency">0</span>
+                        <span>Property Taxes</span><span id="bdTaxes" class="summary-value" data-edit="taxes" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>HOI  </span><span id="bdHOI" class="summary-value" data-edit="hoi" data-type="currency">0</span>
+                        <span>Homeowners Insurance  </span><span id="bdHOI" class="summary-value" data-edit="hoi" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>HOA  </span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
+                        <span>Private Mortgage Insurance  </span><span id="bdPMI" class="summary-value" data-edit="pmi" data-type="currency">0</span>
                     </div>
                     <div class="dropdown-row">
-                        <span>PMI  </span><span id="bdPMI" class="summary-value" data-edit="pmi" data-type="currency">0</span>
+                        <span>Homeowners Association Dues  </span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
                     </div>
                 </div>
             </div>
@@ -367,7 +452,7 @@
 
             <!-- Editable Variables -->
             <div class="summary-row">
-                <span class="summary-label">Down Payment  </span>
+                <span class="summary-label">Down Payment %  </span>
                 <span class="summary-value" data-edit="downPct" data-type="percent">5</span>
             </div>
 
@@ -382,7 +467,7 @@
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Gross Income  </span>
+                <span class="summary-label">Monthly Income  </span>
                 <span class="summary-value" data-edit="grossIncome" data-type="currency">0</span>
             </div>
 
@@ -392,8 +477,12 @@
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">DTI  </span>
+                <span class="summary-label">Debt-to-Income Ratio  </span>
                 <span class="summary-value" data-edit="dtiPct" data-type="percent">45</span>
+            </div>
+
+            <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
+                Tap any italicized number to customize
             </div>
 
         </div>
@@ -586,8 +675,14 @@ debtInput.addEventListener("keydown", (e) => {
 // observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
 
 backBtn.onclick = () => {
-    summary.classList.remove("active");
-    step2.classList.add("active");
+    // If in explanation mode, toggle back to calculator mode
+    if (explanationMode) {
+        toggleExplanationMode();
+    } else {
+        // Otherwise go back to step 2
+        summary.classList.remove("active");
+        step2.classList.add("active");
+    }
 };
 
 /* ============================================================
@@ -653,78 +748,50 @@ function calculate(editedField = null) {
         state.taxes = tempTaxes;
         state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
     }
-    // If user edited any breakdown item (pi, taxes, hoi, hoa, pmi), recalculate monthly payment and DTI
+    // If user edited any breakdown item (pi, taxes, hoi, hoa, pmi), keep DTI constant and adjust purchase price
     else if (editedField === 'pi' || editedField === 'taxes' || editedField === 'hoi' || editedField === 'hoa' || editedField === 'pmi') {
-        // Calculate monthly payment from breakdown items
-        PI = state.pi || 0;
-
-        // Calculate loan from PI
-        if (PI > 0 && r > 0) {
-            loan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
-        } else if (PI > 0) {
-            loan = PI * n;
-        }
-        if (!isFinite(loan) || loan < 0) loan = 0;
-
-        // Calculate purchase price
-        purchase = loan > 0 ? loan / (1 - down) : 0;
-
-        // If taxes were manually edited, keep that value, otherwise recalculate
-        if (editedField !== 'taxes') {
-            state.taxes = purchase * 0.005 / 12;
-        }
-
-        // If PMI was manually edited, keep that value, otherwise recalculate
-        if (editedField !== 'pmi') {
-            state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
-        }
-
-        monthlyPayment = PI + state.taxes + state.hoi + state.hoa + state.pmi;
-
-        // Recalculate DTI from monthly payment
-        if (g > 0) {
-            state.dtiPct = ((monthlyPayment + debt) / g) * 100;
-        }
-    }
-    // If user edited down payment percentage, recalculate taxes and PMI
-    else if (editedField === 'downPct') {
+        // Keep DTI constant, work backwards to find affordable purchase price
         const dti = state.dtiPct / 100;
-        monthlyPayment = (g * dti) - debt;
-        if (monthlyPayment < 0) monthlyPayment = 0;
-
-        // Iteratively calculate loan, taxes, and PMI
-        let tempLoan = 0;
-        let tempPMI = 0;
-        let tempTaxes = 0;
-        let tempPurchase = 0;
-
-        for (let i = 0; i < 10; i++) {
-            const monthlyOther = tempTaxes + state.hoi + state.hoa + tempPMI;
-            PI = monthlyPayment - monthlyOther;
+        const maxMonthlyPayment = (g * dti) - debt;
+        if (maxMonthlyPayment < 0) {
+            monthlyPayment = 0;
+            PI = 0;
+            loan = 0;
+            purchase = 0;
+        } else {
+            // Calculate what PI can be given the other costs
+            const otherCosts = state.taxes + state.hoi + state.hoa + state.pmi;
+            PI = maxMonthlyPayment - otherCosts;
             if (PI < 0) PI = 0;
 
+            // Calculate loan from PI
             if (PI > 0 && r > 0) {
-                tempLoan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
+                loan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
             } else if (PI > 0) {
-                tempLoan = PI * n;
+                loan = PI * n;
             }
-            if (!isFinite(tempLoan) || tempLoan < 0) tempLoan = 0;
+            if (!isFinite(loan) || loan < 0) loan = 0;
 
-            // Calculate purchase price from loan
-            tempPurchase = tempLoan > 0 ? tempLoan / (1 - down) : 0;
+            // Calculate purchase price
+            purchase = loan > 0 ? loan / (1 - down) : 0;
 
-            // Calculate taxes as 0.5% of purchase price per year, divided by 12 for monthly
-            tempTaxes = tempPurchase * 0.005 / 12;
+            // If taxes were manually edited, keep that value, otherwise recalculate
+            if (editedField !== 'taxes') {
+                state.taxes = purchase * 0.005 / 12;
+            }
 
-            tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
+            // If PMI was manually edited, keep that value, otherwise recalculate
+            if (editedField !== 'pmi') {
+                state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
+            }
+
+            monthlyPayment = PI + state.taxes + state.hoi + state.hoa + state.pmi;
         }
 
-        loan = tempLoan;
-        purchase = tempPurchase;
-        state.taxes = tempTaxes;
-        state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
+        // Store PI in state
+        state.pi = PI;
     }
-    // Default: calculate from DTI initially
+    // For all other fields (downPct, grossIncome, monthlyDebt, interestRate, termYears), keep DTI constant
     else {
         const dti = state.dtiPct / 100;
         monthlyPayment = (g * dti) - debt;
@@ -761,18 +828,12 @@ function calculate(editedField = null) {
         purchase = tempPurchase;
         state.taxes = tempTaxes;
         state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
-
-        // Also recalculate DTI to keep it in sync
-        if (g > 0) {
-            state.dtiPct = ((monthlyPayment + debt) / g) * 100;
-        }
     }
 
     // Store PI in state for reference
     state.pi = PI;
 
-    // Calculate purchase price and down payment
-    purchase = loan > 0 ? loan / (1 - down) : 0;
+    // Calculate down payment from purchase price (purchase already calculated in branches above)
     downPayment = purchase * down;
 
     // Display
@@ -936,6 +997,53 @@ function setupEditableFields() {
                 finalText += '.' + decimals;
             }
 
+            // Apply digit limits based on field type
+            const integerPart = finalText.split('.')[0];
+            const decimalPart = finalText.includes('.') ? finalText.split('.')[1] : '';
+
+            // Define max digits for each field (total including integer and decimal)
+            let maxIntegerDigits = 5; // default
+            let maxDecimalDigits = 0;
+
+            if (key === "pi") {
+                maxIntegerDigits = 5; // max 99,999
+            } else if (key === "taxes") {
+                maxIntegerDigits = 4; // max 9,999
+            } else if (key === "hoi") {
+                maxIntegerDigits = 4; // max 9,999
+            } else if (key === "hoa") {
+                maxIntegerDigits = 4; // max 9,999
+            } else if (key === "pmi") {
+                maxIntegerDigits = 4; // max 9,999
+            } else if (key === "downPct") {
+                maxIntegerDigits = 2; // max 99.9%
+                maxDecimalDigits = 1;
+            } else if (key === "interestRate") {
+                maxIntegerDigits = 2; // max 99.999%
+                maxDecimalDigits = 3;
+            } else if (key === "termYears") {
+                maxIntegerDigits = 3; // max 999 years
+            } else if (key === "grossIncome") {
+                maxIntegerDigits = 5; // max 99,999
+            } else if (key === "monthlyDebt") {
+                maxIntegerDigits = 5; // max 99,999
+            } else if (key === "dtiPct") {
+                maxIntegerDigits = 2; // max 99.99%
+                maxDecimalDigits = 2;
+            }
+
+            // Limit integer part
+            let limitedInteger = integerPart.substring(0, maxIntegerDigits);
+
+            // Reconstruct finalText with limits
+            if (decimalPart && maxDecimalDigits > 0) {
+                finalText = limitedInteger + '.' + decimalPart.substring(0, maxDecimalDigits);
+            } else if (finalText.includes('.') && maxDecimalDigits > 0) {
+                finalText = limitedInteger + '.';
+            } else {
+                finalText = limitedInteger;
+            }
+
             // Add suffix/prefix based on type
             if (type === "currency") {
                 finalText = "$" + finalText;
@@ -1015,12 +1123,30 @@ function setupEditableFields() {
 function finishEditing(el, key, type) {
     let text = el.textContent.replace(/[^0-9.-]+/g, "");
     let numValue = parseFloat(text) || 0;
-    
+
+    // Prevent negative numbers
+    if (numValue < 0) {
+        numValue = 0;
+    }
+
+    // Apply max limits
+    if (key === "pi" && numValue > 99999) numValue = 99999;
+    else if (key === "taxes" && numValue > 9999) numValue = 9999;
+    else if (key === "hoi" && numValue > 9999) numValue = 9999;
+    else if (key === "hoa" && numValue > 9999) numValue = 9999;
+    else if (key === "pmi" && numValue > 9999) numValue = 9999;
+    else if (key === "downPct" && numValue > 99.9) numValue = 99.9;
+    else if (key === "interestRate" && numValue > 99.999) numValue = 99.999;
+    else if (key === "termYears" && numValue > 999) numValue = 999;
+    else if (key === "grossIncome" && numValue > 99999) numValue = 99999;
+    else if (key === "monthlyDebt" && numValue > 99999) numValue = 99999;
+    else if (key === "dtiPct" && numValue > 99.99) numValue = 99.99;
+
     state[key] = numValue;
-    
+
     // Recalculate based on what was edited
     calculate(key);
-    
+
     formatEditableInput(el, type, key);
 }
 
@@ -1061,6 +1187,339 @@ calculate = function(editedField) {
         });
     }, 10);
 };
+
+/* ============================================================
+   EXPLANATION MODE
+   ============================================================ */
+let explanationMode = false;
+
+const explanations = {
+    homeAffordability: {
+        label: "Purchase Price",
+        text: "The maximum home price you can afford based on your income and debts."
+    },
+    loanAmount: {
+        label: "Loan Amount",
+        text: "The total amount you'll borrow from a lender to purchase the home."
+    },
+    downPayment: {
+        label: "Down Payment",
+        text: "The upfront cash payment you make toward the purchase price."
+    },
+    monthlyPayment: {
+        label: "Monthly Payment",
+        text: "Your total monthly payment including principal, interest, taxes, and insurance."
+    },
+    principal: {
+        label: "Principal",
+        text: "The portion of your monthly payment that reduces your loan balance."
+    },
+    interest: {
+        label: "Interest",
+        text: "The portion of your monthly payment that covers the cost of borrowing."
+    },
+    propertyTaxes: {
+        label: "Property Taxes",
+        text: "Monthly property taxes paid to your local government."
+    },
+    homeownersInsurance: {
+        label: "Homeowners Insurance",
+        text: "Monthly insurance premium to protect your home and belongings."
+    },
+    hoaDues: {
+        label: "Homeowners Association Dues",
+        text: "Monthly fee for shared amenities and community maintenance."
+    },
+    pmi: {
+        label: "Private Mortgage Insurance",
+        text: "Required insurance when your down payment is less than 20%."
+    },
+    interestRate: {
+        label: "Interest Rate",
+        text: "The annual cost of borrowing, expressed as a percentage of your loan."
+    },
+    loanTerm: {
+        label: "Loan Term",
+        text: "The number of years you have to repay the mortgage loan in full."
+    },
+    monthlyIncome: {
+        label: "Monthly Income",
+        text: "Your total monthly income before any taxes or deductions."
+    },
+    monthlyDebt: {
+        label: "Monthly Debt",
+        text: "All recurring monthly debt payments including car loans and credit cards."
+    },
+    dti: {
+        label: "Debt-to-Income Ratio",
+        text: "The percentage of your monthly income used to pay all debts."
+    }
+};
+
+function toggleExplanationMode() {
+    explanationMode = !explanationMode;
+    const button = document.getElementById('explanationToggle');
+    const dropdown = document.querySelector('.dropdown');
+    const editNote = document.querySelector('[style*="text-align: center"]');
+    const backBtn = document.getElementById('backBtn');
+
+    if (explanationMode) {
+        button.textContent = 'Calculator';
+        button.style.top = '50%';
+        button.style.transform = 'translateY(-50%)';
+
+        // Get all summary rows in the section-box
+        const sectionBox = document.querySelector('.section-box');
+
+        // Calculate current values for display
+        const g = state.grossIncome;
+        const debt = state.monthlyDebt;
+        const dti = state.dtiPct / 100;
+        const down = state.downPct / 100;
+        const r = (state.interestRate / 100) / 12;
+        const n = state.termYears * 12;
+        const needsPMI = state.downPct < 20;
+
+        let monthlyPayment = (g * dti) - debt;
+        if (monthlyPayment < 0) monthlyPayment = 0;
+
+        let tempLoan = 0;
+        let tempPMI = 0;
+        let tempTaxes = 0;
+        let tempPurchase = 0;
+        let PI = 0;
+
+        for (let i = 0; i < 10; i++) {
+            const monthlyOther = tempTaxes + state.hoi + state.hoa + tempPMI;
+            PI = monthlyPayment - monthlyOther;
+            if (PI < 0) PI = 0;
+
+            if (PI > 0 && r > 0) {
+                tempLoan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
+            } else if (PI > 0) {
+                tempLoan = PI * n;
+            }
+            if (!isFinite(tempLoan) || tempLoan < 0) tempLoan = 0;
+
+            tempPurchase = tempLoan > 0 ? tempLoan / (1 - down) : 0;
+            tempTaxes = tempPurchase * 0.005 / 12;
+            tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
+        }
+
+        const purchase = tempPurchase;
+        const loan = tempLoan;
+        const downPayment = purchase * down;
+        const principal = PI;
+        const interest = PI; // This is combined P+I for now
+
+        // Build new HTML with all explanations as dropdown sections
+        sectionBox.innerHTML = `
+            <div class="explanation-section">
+                <h3 id="loanDefHeader">Loan Definitions ▼</h3>
+                <div id="loanDefContent" class="explanation-dropdown-content">
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.homeAffordability.label}</span> - ${explanations.homeAffordability.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.loanAmount.label}</span> - ${explanations.loanAmount.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.downPayment.label}</span> - ${explanations.downPayment.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.interestRate.label}</span> - ${explanations.interestRate.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.loanTerm.label}</span> - ${explanations.loanTerm.text}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explanation-section">
+                <h3 id="paymentDefHeader">Monthly Payment Definitions ▼</h3>
+                <div id="paymentDefContent" class="explanation-dropdown-content">
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.monthlyPayment.label}</span> - ${explanations.monthlyPayment.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.principal.label}</span> - ${explanations.principal.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.interest.label}</span> - ${explanations.interest.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.propertyTaxes.label}</span> - ${explanations.propertyTaxes.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.homeownersInsurance.label}</span> - ${explanations.homeownersInsurance.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.pmi.label}</span> - ${explanations.pmi.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.hoaDues.label}</span> - ${explanations.hoaDues.text}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="explanation-section">
+                <h3 id="incomeDefHeader">Income Definitions ▼</h3>
+                <div id="incomeDefContent" class="explanation-dropdown-content">
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.monthlyIncome.label}</span> - ${explanations.monthlyIncome.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.monthlyDebt.label}</span> - ${explanations.monthlyDebt.text}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.dti.label}</span> - ${explanations.dti.text}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Setup dropdown toggles
+        const loanDefHeader = document.getElementById('loanDefHeader');
+        const loanDefContent = document.getElementById('loanDefContent');
+        const paymentDefHeader = document.getElementById('paymentDefHeader');
+        const paymentDefContent = document.getElementById('paymentDefContent');
+        const incomeDefHeader = document.getElementById('incomeDefHeader');
+        const incomeDefContent = document.getElementById('incomeDefContent');
+
+        loanDefHeader.onclick = () => {
+            const visible = loanDefContent.style.display === "block";
+            loanDefContent.style.display = visible ? "none" : "block";
+            loanDefHeader.textContent = visible ? "Loan Definitions ▼" : "Loan Definitions ▲";
+        };
+
+        paymentDefHeader.onclick = () => {
+            const visible = paymentDefContent.style.display === "block";
+            paymentDefContent.style.display = visible ? "none" : "block";
+            paymentDefHeader.textContent = visible ? "Monthly Payment Definitions ▼" : "Monthly Payment Definitions ▲";
+        };
+
+        incomeDefHeader.onclick = () => {
+            const visible = incomeDefContent.style.display === "block";
+            incomeDefContent.style.display = visible ? "none" : "block";
+            incomeDefHeader.textContent = visible ? "Income Definitions ▼" : "Income Definitions ▲";
+        };
+
+        // Change back button text to "Back"
+        backBtn.textContent = 'Back';
+
+    } else {
+        button.textContent = 'Definitions';
+        button.style.top = '50%';
+        button.style.transform = 'translateY(-50%)';
+
+        // Restore numbers - rebuild the entire section-box with original structure
+        const sectionBox = document.querySelector('.section-box');
+        sectionBox.innerHTML = `
+            <div class="summary-row">
+                <span class="summary-label">Purchase Price</span>
+                <span id="purchaseBig" class="summary-value">$0</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Loan Amount</span>
+                <span id="sumLoan" class="summary-value">$0</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Down Payment</span>
+                <span id="sumDown" class="summary-value">$0</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Monthly Payment</span>
+                <span id="sumMonthly" class="summary-value">$0</span>
+            </div>
+
+            <!-- DROPDOWN -->
+            <div class="dropdown">
+                <button id="toggleBreakdown">Show Payment Breakdown ▼</button>
+                <div id="breakdownBox" class="dropdown-content">
+                    <div class="dropdown-row">
+                        <span>Principal + Interest  </span><span id="bdPI" class="summary-value" data-edit="pi" data-type="currency">0</span>
+                    </div>
+                    <div class="dropdown-row">
+                        <span>Property Taxes</span><span id="bdTaxes" class="summary-value" data-edit="taxes" data-type="currency">0</span>
+                    </div>
+                    <div class="dropdown-row">
+                        <span>Homeowners Insurance  </span><span id="bdHOI" class="summary-value" data-edit="hoi" data-type="currency">0</span>
+                    </div>
+                    <div class="dropdown-row">
+                        <span>Private Mortgage Insurance  </span><span id="bdPMI" class="summary-value" data-edit="pmi" data-type="currency">0</span>
+                    </div>
+                    <div class="dropdown-row">
+                        <span>Homeowners Association Dues  </span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Editable Variables -->
+            <div class="summary-row">
+                <span class="summary-label">Down Payment %  </span>
+                <span class="summary-value" data-edit="downPct" data-type="percent">5</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Interest Rate  </span>
+                <span class="summary-value" data-edit="interestRate" data-type="percent">6</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Loan Term        </span>
+                <span class="summary-value" data-edit="termYears" data-type="years">30</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Monthly Income  </span>
+                <span class="summary-value" data-edit="grossIncome" data-type="currency">0</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Monthly Debt  </span>
+                <span class="summary-value" data-edit="monthlyDebt" data-type="currency">0</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Debt-to-Income Ratio  </span>
+                <span class="summary-value" data-edit="dtiPct" data-type="percent">45</span>
+            </div>
+
+            <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
+                Tap any italicized number to customize
+            </div>
+        `;
+
+        // Re-setup dropdown functionality
+        const toggleBreakdownBtn = document.getElementById('toggleBreakdown');
+        const breakdownBox = document.getElementById('breakdownBox');
+        toggleBreakdownBtn.onclick = () => {
+            const visible = breakdownBox.style.display === "block";
+            breakdownBox.style.display = visible ? "none" : "block";
+            toggleBreakdownBtn.textContent = visible
+                ? "Show Payment Breakdown ▼"
+                : "Hide Payment Breakdown ▲";
+        };
+
+        // Restore back button text
+        backBtn.textContent = 'Back';
+
+        // Restore numbers
+        calculate();
+
+        // Re-setup editable fields
+        setTimeout(() => {
+            setupEditableFields();
+        }, 100);
+    }
+}
+
+document.getElementById('explanationToggle').addEventListener('click', toggleExplanationMode);
 </script>
 
 </body>
