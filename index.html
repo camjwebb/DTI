@@ -206,6 +206,9 @@
         .summary-value[contenteditable="true"]:focus {
             outline: 2px solid #2563eb;
         }
+        .summary-value[contenteditable="true"].no-outline:focus {
+            outline: none !important;
+        }
         .summary-value[contenteditable="true"] {
             -webkit-tap-highlight-color: transparent;
         }
@@ -229,6 +232,9 @@
         }
         .dropdown-row span:last-child[contenteditable="true"]:focus {
             outline: 2px solid #2563eb;
+        }
+        .dropdown-row span:last-child[contenteditable="true"].no-outline:focus {
+            outline: none !important;
         }
         .dropdown-row span:last-child[contenteditable="true"] {
             -webkit-tap-highlight-color: transparent;
@@ -1150,6 +1156,9 @@ function setupEditableFields() {
                 e.preventDefault();
                 isEnterPressed = true;
 
+                // Add no-outline class IMMEDIATELY to disable focus outline
+                this.classList.add('no-outline');
+
                 // Process the edit first
                 let text = this.textContent.replace(/[^0-9.-]+/g, "");
                 let numValue = parseFloat(text) || 0;
@@ -1174,16 +1183,26 @@ function setupEditableFields() {
                 calculate(key);
                 formatEditableInput(this, type, key);
 
-                // Remove contenteditable temporarily to force focus loss
-                this.removeAttribute('contenteditable');
-                this.blur();
+                // Aggressive blur sequence
+                const element = this;
+
+                // Step 1: Blur and force focus away
+                element.blur();
                 document.body.focus();
 
-                // Restore contenteditable and scroll after brief delay
-                setTimeout(() => {
-                    this.setAttribute('contenteditable', 'true');
+                // Step 2: Use requestAnimationFrame to ensure visual update
+                requestAnimationFrame(() => {
+                    // Force a reflow to ensure the no-outline class takes effect
+                    void element.offsetHeight;
+
+                    // Scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 0);
+
+                    // Remove the no-outline class after scroll starts
+                    setTimeout(() => {
+                        element.classList.remove('no-outline');
+                    }, 100);
+                });
 
             } else if (e.key === "Escape") {
                 e.preventDefault();
