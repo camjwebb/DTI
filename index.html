@@ -1142,7 +1142,18 @@ function setupEditableFields() {
         el.addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();
+
+                // Force blur and clear focus immediately
                 this.blur();
+                document.body.focus();
+
+                // Ensure the element loses visual focus state
+                setTimeout(() => {
+                    if (document.activeElement && document.activeElement !== document.body) {
+                        document.activeElement.blur();
+                        document.body.focus();
+                    }
+                }, 0);
             } else if (e.key === "Escape") {
                 e.preventDefault();
                 this.textContent = originalValue.toString();
