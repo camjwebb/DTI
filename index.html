@@ -1156,9 +1156,6 @@ function setupEditableFields() {
                 e.preventDefault();
                 isEnterPressed = true;
 
-                // Add no-outline class IMMEDIATELY to disable focus outline
-                this.classList.add('no-outline');
-
                 // Process the edit first
                 let text = this.textContent.replace(/[^0-9.-]+/g, "");
                 let numValue = parseFloat(text) || 0;
@@ -1183,26 +1180,35 @@ function setupEditableFields() {
                 calculate(key);
                 formatEditableInput(this, type, key);
 
+                // CRITICAL: Add no-outline AFTER formatting (which can refocus element)
+                this.classList.add('no-outline');
+
+                // Force immediate style recalculation
+                void this.offsetHeight;
+
                 // Aggressive blur sequence
                 const element = this;
 
-                // Step 1: Blur and force focus away
+                // Blur immediately after style is applied
                 element.blur();
+
+                // Clear selection to prevent any visual artifacts
+                if (window.getSelection) {
+                    window.getSelection().removeAllRanges();
+                }
+
+                // Force focus to body
                 document.body.focus();
 
-                // Step 2: Use requestAnimationFrame to ensure visual update
-                requestAnimationFrame(() => {
-                    // Force a reflow to ensure the no-outline class takes effect
-                    void element.offsetHeight;
-
-                    // Scroll to top
+                // Scroll to top and cleanup
+                setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                    // Remove the no-outline class after scroll starts
+                    // Remove no-outline class after scroll completes
                     setTimeout(() => {
                         element.classList.remove('no-outline');
-                    }, 100);
-                });
+                    }, 300);
+                }, 0);
 
             } else if (e.key === "Escape") {
                 e.preventDefault();
