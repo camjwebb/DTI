@@ -204,16 +204,11 @@
             padding: 2px 4px;
         }
         .summary-value[contenteditable="true"]:focus {
-            outline: 2px solid #2563eb;
+            outline: none;
+            color: #2563eb;
         }
-        .summary-value[contenteditable="true"].no-outline:focus {
-            outline: none !important;
-        }
-        /* Override focus outline on mobile after editing */
-        @media screen and (max-width: 420px) {
-            .summary-value[contenteditable="true"].editing-done:focus {
-                outline: none !important;
-            }
+        .summary-row:has(.summary-value[contenteditable="true"]:focus) .summary-label {
+            color: #2563eb;
         }
         .summary-value[contenteditable="true"] {
             -webkit-tap-highlight-color: transparent;
@@ -237,16 +232,11 @@
             padding: 2px 4px;
         }
         .dropdown-row span:last-child[contenteditable="true"]:focus {
-            outline: 2px solid #2563eb;
+            outline: none;
+            color: #2563eb;
         }
-        .dropdown-row span:last-child[contenteditable="true"].no-outline:focus {
-            outline: none !important;
-        }
-        /* Override focus outline on mobile after editing */
-        @media screen and (max-width: 420px) {
-            .dropdown-row span:last-child[contenteditable="true"].editing-done:focus {
-                outline: none !important;
-            }
+        .dropdown-row:has(span:last-child[contenteditable="true"]:focus) span:first-child {
+            color: #2563eb;
         }
         .dropdown-row span:last-child[contenteditable="true"] {
             -webkit-tap-highlight-color: transparent;
@@ -1168,11 +1158,7 @@ function setupEditableFields() {
                 e.preventDefault();
                 isEnterPressed = true;
 
-                // Add editing-done class IMMEDIATELY before any processing
-                this.classList.add('editing-done');
-                this.classList.add('no-outline');
-
-                // Process the edit first
+                // Process the edit
                 let text = this.textContent.replace(/[^0-9.-]+/g, "");
                 let numValue = parseFloat(text) || 0;
 
@@ -1196,32 +1182,12 @@ function setupEditableFields() {
                 calculate(key);
                 formatEditableInput(this, type, key);
 
-                // Force immediate style recalculation
-                void this.offsetHeight;
+                // Blur to remove focus (which removes blue color via CSS)
+                this.blur();
 
-                // Aggressive blur sequence
-                const element = this;
-
-                // Blur immediately
-                element.blur();
-
-                // Clear selection to prevent any visual artifacts
-                if (window.getSelection) {
-                    window.getSelection().removeAllRanges();
-                }
-
-                // Force focus to body
-                document.body.focus();
-
-                // Scroll to top and cleanup
+                // Scroll to top
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                    // Remove classes after scroll completes
-                    setTimeout(() => {
-                        element.classList.remove('no-outline');
-                        element.classList.remove('editing-done');
-                    }, 300);
                 }, 0);
 
             } else if (e.key === "Escape") {
