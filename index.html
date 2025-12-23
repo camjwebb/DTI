@@ -1135,25 +1135,56 @@ function setupEditableFields() {
             }
         });
         
+        let isEnterPressed = false;
+
         el.addEventListener("blur", function() {
-            finishEditing(this, key, type);
+            // Only process blur if it wasn't triggered by Enter key
+            if (!isEnterPressed) {
+                finishEditing(this, key, type);
+            }
+            isEnterPressed = false;
         });
-        
+
         el.addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();
+                isEnterPressed = true;
 
-                // Force blur and clear focus immediately
+                // Process the edit first
+                let text = this.textContent.replace(/[^0-9.-]+/g, "");
+                let numValue = parseFloat(text) || 0;
+
+                // Prevent negative numbers
+                if (numValue < 0) numValue = 0;
+
+                // Apply max limits
+                if (key === "pi" && numValue > 99999) numValue = 99999;
+                else if (key === "taxes" && numValue > 9999) numValue = 9999;
+                else if (key === "hoi" && numValue > 9999) numValue = 9999;
+                else if (key === "hoa" && numValue > 9999) numValue = 9999;
+                else if (key === "pmi" && numValue > 9999) numValue = 9999;
+                else if (key === "downPct" && numValue > 50.0) numValue = 50.0;
+                else if (key === "interestRate" && numValue > 20.0) numValue = 20.0;
+                else if (key === "termYears" && numValue > 50) numValue = 50;
+                else if (key === "grossIncome" && numValue > 99999) numValue = 99999;
+                else if (key === "monthlyDebt" && numValue > 99999) numValue = 99999;
+                else if (key === "dtiPct" && numValue > 56.99) numValue = 56.99;
+
+                state[key] = numValue;
+                calculate(key);
+                formatEditableInput(this, type, key);
+
+                // Remove contenteditable temporarily to force focus loss
+                this.removeAttribute('contenteditable');
                 this.blur();
                 document.body.focus();
 
-                // Ensure the element loses visual focus state
+                // Restore contenteditable and scroll after brief delay
                 setTimeout(() => {
-                    if (document.activeElement && document.activeElement !== document.body) {
-                        document.activeElement.blur();
-                        document.body.focus();
-                    }
+                    this.setAttribute('contenteditable', 'true');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 0);
+
             } else if (e.key === "Escape") {
                 e.preventDefault();
                 this.textContent = originalValue.toString();
