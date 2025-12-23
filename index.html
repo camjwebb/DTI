@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        /* Prevent zoom on input focus on mobile */
+        @media screen and (max-width: 420px) {
+            select, textarea, input[type="text"] {
+                font-size: 16px !important;
+            }
+        }
+    </style>
     <title>Home Affordability Estimator</title>
 
     <style>
@@ -49,7 +57,7 @@
             font-size: 6vw;
             font-weight: 800;
             text-align: center;
-            margin-bottom: 2vh;
+            margin-bottom: 1vh;
             color: #0b2345;
         }
         @media (min-width: 420px) {
@@ -140,7 +148,7 @@
             padding: 3vw;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            margin-top: 2vh;
+            margin-top: 1vh;
             overflow-y: auto;
         }
         @media (min-width: 420px) {
@@ -268,9 +276,13 @@
         footer {
             text-align: center;
             font-size: 2.5vw;
-            margin-top: 2vh;
+            margin-top: 1vh;
             color: #6a7485;
             line-height: 1.5;
+        }
+        footer a {
+            color: #6a7485;
+            text-decoration: underline;
         }
         @media (min-width: 420px) {
             footer {
@@ -344,6 +356,8 @@
             color: #0b2345;
             cursor: pointer;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
         .explanation-section h3:hover {
             color: #2563eb;
@@ -494,7 +508,7 @@
         <footer>
             Have questions or want to review your numbers?<br>
             Contact Cameron Webb<br>
-            (801) 472-4951 | cameron.webb@houzd.com
+            (801) 472-4951 | <a href="mailto:cameron.webb@houzd.com">cameron.webb@houzd.com</a>
         </footer>
 
     </div>
@@ -1387,18 +1401,21 @@ function toggleExplanationMode() {
             const visible = loanDefContent.style.display === "block";
             loanDefContent.style.display = visible ? "none" : "block";
             loanDefHeader.textContent = visible ? "Loan Definitions ▼" : "Loan Definitions ▲";
+            loanDefHeader.blur();
         };
 
         paymentDefHeader.onclick = () => {
             const visible = paymentDefContent.style.display === "block";
             paymentDefContent.style.display = visible ? "none" : "block";
             paymentDefHeader.textContent = visible ? "Monthly Payment Definitions ▼" : "Monthly Payment Definitions ▲";
+            paymentDefHeader.blur();
         };
 
         incomeDefHeader.onclick = () => {
             const visible = incomeDefContent.style.display === "block";
             incomeDefContent.style.display = visible ? "none" : "block";
             incomeDefHeader.textContent = visible ? "Income Definitions ▼" : "Income Definitions ▲";
+            incomeDefHeader.blur();
         };
 
         // Hide back button in explanation mode
