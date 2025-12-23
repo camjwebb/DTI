@@ -2,35 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Affordability Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home Affordability Estimator</title>
 
     <style>
         /* ============================================================
            UNIVERSAL & MOBILE FIRST
            ============================================================ */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: auto;
+        }
         body {
             font-family: Arial, Helvetica, sans-serif;
             background: #f4f6fb;
             padding: 10px;
             color: #1a1a1a;
-            cursor: default;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-y: scroll;
+            user-select: text;
         }
-        body * {
-            cursor: inherit;
-        }
-        [contenteditable="true"],
-        input,
-        button {
+        input {
             cursor: text;
         }
         button {
             cursor: pointer;
+            user-select: none;
         }
         .container {
             max-width: 420px;
@@ -165,7 +166,6 @@
         }
         .summary-value {
             font-weight: 800;
-            cursor: text;
             min-width: 80px;
             max-width: 150px;
             display: inline-block;
@@ -200,7 +200,6 @@
         }
         .dropdown-row span:last-child {
             font-weight: 800;
-            cursor: text;
             min-width: 80px;
             max-width: 150px;
             display: inline-block;
@@ -271,6 +270,7 @@
             font-size: 2.5vw;
             margin-top: 2vh;
             color: #6a7485;
+            line-height: 1.5;
         }
         @media (min-width: 420px) {
             footer {
@@ -281,7 +281,7 @@
         /* Explanation Mode Button */
         .explanation-toggle {
             position: absolute;
-            top: 50%;
+            top: -10px;
             transform: translateY(-50%);
             right: 0;
             background: #e9edf5;
@@ -308,7 +308,7 @@
             position: relative;
             display: block;
             width: 100%;
-            min-height: 20px;
+            min-height: 5px;
         }
 
         /* Explanation text styles */
@@ -334,7 +334,7 @@
 
         /* Explanation dropdown styles */
         .explanation-section {
-            margin-bottom: 12px;
+            margin-bottom: 24px;
         }
         .explanation-section h3 {
             font-size: 20px;
@@ -358,13 +358,14 @@
             display: none;
             padding-top: 8px;
         }
+
     </style>
 </head>
 <body>
 
 <div class="container">
 
-    <h1>Home Affordability</h1>
+    <h1>Home Affordability Estimator</h1>
 
     <!-- ============================================================
         STEP 1: INCOME
@@ -384,7 +385,7 @@
         ============================================================ -->
     <div id="step2" class="step">
         <h2>Your Monthly Debt Payments</h2>
-        <p class="sub">Car loans, student loans, credit card minimums, and other debt payments (don't include rent or utilities)</p>
+        <p class="sub">Car loans, students loans, credit cards, other debts.</p>
 
         <label>Total Monthly Debt</label>
         <input id="debtInput" type="text" inputmode="numeric" placeholder="$500">
@@ -478,11 +479,11 @@
 
             <div class="summary-row">
                 <span class="summary-label">Debt-to-Income Ratio  </span>
-                <span class="summary-value" data-edit="dtiPct" data-type="percent">45</span>
+                <span class="summary-value" data-edit="dtiPct" data-type="percent">36</span>
             </div>
 
             <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
-                Tap any italicized number to customize
+                Click any italicized number to customize
             </div>
 
         </div>
@@ -491,12 +492,15 @@
 
         <!-- FOOTER -->
         <footer>
-            Cameron Webb - Mortgage Loan Officer - NMLS: 2603718
+            Have questions or want to review your numbers?<br>
+            Contact Cameron Webb<br>
+            (801) 472-4951 | cameron.webb@houzd.com
         </footer>
 
     </div>
 
 </div>
+
 
 <script>
 /* ============================================================
@@ -505,7 +509,7 @@
 let state = {
     grossIncome: 0,
     monthlyDebt: 0,
-    dtiPct: 45,
+    dtiPct: 36,
     downPct: 5,
     interestRate: 6,
     termYears: 30,
@@ -579,22 +583,25 @@ goToStep2.onclick = goToStep2Func;
 
 // Format income input as currency
 incomeInput.addEventListener("input", () => formatCurrencyInput(incomeInput));
+incomeInput.addEventListener("focus", () => {
+    incomeInput.select();
+});
 incomeInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         goToStep2Func();
     }
 });
 
-// // Autofocus income input when step1 becomes active
-// const observer1 = new MutationObserver(() => {
-//     if (step1.classList.contains("active")) {
-//         incomeInput.focus();
-//     }
-// });
-// observer1.observe(step1, { attributes: true, attributeFilter: ["class"] });
-// if (step1.classList.contains("active")) {
-//     incomeInput.focus();
-// }
+// Autofocus income input when step1 becomes active
+const observer1 = new MutationObserver(() => {
+    if (step1.classList.contains("active")) {
+        incomeInput.focus();
+    }
+});
+observer1.observe(step1, { attributes: true, attributeFilter: ["class"] });
+if (step1.classList.contains("active")) {
+    incomeInput.focus();
+}
 
 backTo1.onclick = () => {
     step2.classList.remove("active");
@@ -660,29 +667,26 @@ goToSummary.onclick = goToSummaryFunc;
 
 // Format debt input as currency
 debtInput.addEventListener("input", () => formatCurrencyInput(debtInput));
+debtInput.addEventListener("focus", () => {
+    debtInput.select();
+});
 debtInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         goToSummaryFunc();
     }
 });
 
-// // Autofocus debt input when step2 becomes active
-// const observer2 = new MutationObserver(() => {
-//     if (step2.classList.contains("active")) {
-//         debtInput.focus();
-//     }
-// });
-// observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
+// Autofocus debt input when step2 becomes active
+const observer2 = new MutationObserver(() => {
+    if (step2.classList.contains("active")) {
+        debtInput.focus();
+    }
+});
+observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
 
 backBtn.onclick = () => {
-    // If in explanation mode, toggle back to calculator mode
-    if (explanationMode) {
-        toggleExplanationMode();
-    } else {
-        // Otherwise go back to step 2
-        summary.classList.remove("active");
-        step2.classList.add("active");
-    }
+    summary.classList.remove("active");
+    step2.classList.add("active");
 };
 
 /* ============================================================
@@ -1135,12 +1139,12 @@ function finishEditing(el, key, type) {
     else if (key === "hoi" && numValue > 9999) numValue = 9999;
     else if (key === "hoa" && numValue > 9999) numValue = 9999;
     else if (key === "pmi" && numValue > 9999) numValue = 9999;
-    else if (key === "downPct" && numValue > 99.9) numValue = 99.9;
-    else if (key === "interestRate" && numValue > 99.999) numValue = 99.999;
-    else if (key === "termYears" && numValue > 999) numValue = 999;
+    else if (key === "downPct" && numValue > 50.0) numValue = 50.0;
+    else if (key === "interestRate" && numValue > 20.0) numValue = 20.0;
+    else if (key === "termYears" && numValue > 50) numValue = 50;
     else if (key === "grossIncome" && numValue > 99999) numValue = 99999;
     else if (key === "monthlyDebt" && numValue > 99999) numValue = 99999;
-    else if (key === "dtiPct" && numValue > 99.99) numValue = 99.99;
+    else if (key === "dtiPct" && numValue > 56.99) numValue = 56.99;
 
     state[key] = numValue;
 
@@ -1153,7 +1157,7 @@ function finishEditing(el, key, type) {
 // Setup editable fields on page load
 setupEditableFields();
 
-// Allow clicking anywhere to blur/submit editable fields, and prevent unwanted focus
+// Allow clicking anywhere to blur/submit editable fields
 document.addEventListener('mousedown', function(e) {
     // Allow clicking on inputs, buttons, and contenteditable elements
     if (e.target.hasAttribute('contenteditable') ||
@@ -1165,13 +1169,6 @@ document.addEventListener('mousedown', function(e) {
     // If user clicks anywhere else, blur the active element if it's contenteditable
     if (document.activeElement && document.activeElement.hasAttribute('contenteditable')) {
         document.activeElement.blur();
-    }
-
-    // Prevent focus on anything that's not an input, button, or contenteditable
-    if (!e.target.hasAttribute('contenteditable') &&
-        e.target.tagName !== 'INPUT' &&
-        e.target.tagName !== 'BUTTON') {
-        e.preventDefault();
     }
 });
 
@@ -1265,7 +1262,7 @@ function toggleExplanationMode() {
 
     if (explanationMode) {
         button.textContent = 'Calculator';
-        button.style.top = '50%';
+        button.style.top = '-10px';
         button.style.transform = 'translateY(-50%)';
 
         // Get all summary rows in the section-box
@@ -1317,19 +1314,19 @@ function toggleExplanationMode() {
             <div class="explanation-section">
                 <h3 id="loanDefHeader">Loan Definitions ▼</h3>
                 <div id="loanDefContent" class="explanation-dropdown-content">
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.homeAffordability.label}</span> - ${explanations.homeAffordability.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.loanAmount.label}</span> - ${explanations.loanAmount.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.downPayment.label}</span> - ${explanations.downPayment.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.interestRate.label}</span> - ${explanations.interestRate.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.loanTerm.label}</span> - ${explanations.loanTerm.text}</span>
                     </div>
                 </div>
@@ -1338,25 +1335,25 @@ function toggleExplanationMode() {
             <div class="explanation-section">
                 <h3 id="paymentDefHeader">Monthly Payment Definitions ▼</h3>
                 <div id="paymentDefContent" class="explanation-dropdown-content">
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.monthlyPayment.label}</span> - ${explanations.monthlyPayment.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.principal.label}</span> - ${explanations.principal.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.interest.label}</span> - ${explanations.interest.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.propertyTaxes.label}</span> - ${explanations.propertyTaxes.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.homeownersInsurance.label}</span> - ${explanations.homeownersInsurance.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.pmi.label}</span> - ${explanations.pmi.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.hoaDues.label}</span> - ${explanations.hoaDues.text}</span>
                     </div>
                 </div>
@@ -1365,13 +1362,13 @@ function toggleExplanationMode() {
             <div class="explanation-section">
                 <h3 id="incomeDefHeader">Income Definitions ▼</h3>
                 <div id="incomeDefContent" class="explanation-dropdown-content">
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.monthlyIncome.label}</span> - ${explanations.monthlyIncome.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.monthlyDebt.label}</span> - ${explanations.monthlyDebt.text}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.dti.label}</span> - ${explanations.dti.text}</span>
                     </div>
                 </div>
@@ -1404,12 +1401,12 @@ function toggleExplanationMode() {
             incomeDefHeader.textContent = visible ? "Income Definitions ▼" : "Income Definitions ▲";
         };
 
-        // Change back button text to "Back"
-        backBtn.textContent = 'Back';
+        // Hide back button in explanation mode
+        backBtn.style.display = 'none';
 
     } else {
         button.textContent = 'Definitions';
-        button.style.top = '50%';
+        button.style.top = '-10px';
         button.style.transform = 'translateY(-50%)';
 
         // Restore numbers - rebuild the entire section-box with original structure
@@ -1487,7 +1484,7 @@ function toggleExplanationMode() {
 
             <div class="summary-row">
                 <span class="summary-label">Debt-to-Income Ratio  </span>
-                <span class="summary-value" data-edit="dtiPct" data-type="percent">45</span>
+                <span class="summary-value" data-edit="dtiPct" data-type="percent">36</span>
             </div>
 
             <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
@@ -1506,8 +1503,9 @@ function toggleExplanationMode() {
                 : "Hide Payment Breakdown ▲";
         };
 
-        // Restore back button text
+        // Restore back button
         backBtn.textContent = 'Back';
+        backBtn.style.display = '';
 
         // Restore numbers
         calculate();
