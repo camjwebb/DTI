@@ -6,7 +6,7 @@
     <style>
         /* Prevent zoom on input focus on mobile */
         @media screen and (max-width: 420px) {
-            select, textarea, input[type="text"] {
+            select, textarea, input[type="text"], [contenteditable] {
                 font-size: 16px !important;
             }
         }
@@ -206,6 +206,9 @@
         .summary-value[contenteditable="true"]:focus {
             outline: 2px solid #2563eb;
         }
+        .summary-value[contenteditable="true"] {
+            -webkit-tap-highlight-color: transparent;
+        }
         .dropdown-row span:last-child {
             font-weight: 800;
             min-width: 80px;
@@ -227,6 +230,9 @@
         .dropdown-row span:last-child[contenteditable="true"]:focus {
             outline: 2px solid #2563eb;
         }
+        .dropdown-row span:last-child[contenteditable="true"] {
+            -webkit-tap-highlight-color: transparent;
+        }
 
         hr {
             border: 0;
@@ -243,6 +249,7 @@
             color: #0b2345;
             padding: 2vh 2vw;
             font-size: 3.5vw;
+            -webkit-tap-highlight-color: transparent;
         }
         @media (min-width: 420px) {
             .dropdown button {
@@ -919,6 +926,7 @@ toggleBreakdown.onclick = () => {
     toggleBreakdown.textContent = visible
         ? "Show Payment Breakdown ▼"
         : "Hide Payment Breakdown ▲";
+    toggleBreakdown.blur();
 };
 
 /* ============================================================
