@@ -927,6 +927,11 @@ toggleBreakdown.onclick = () => {
         ? "Show Payment Breakdown ▼"
         : "Hide Payment Breakdown ▲";
     toggleBreakdown.blur();
+
+    // Scroll to top when closing the dropdown
+    if (visible) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 };
 
 /* ============================================================
@@ -1175,6 +1180,15 @@ function finishEditing(el, key, type) {
     calculate(key);
 
     formatEditableInput(el, type, key);
+
+    // Scroll to top and blur the element to remove any focus/highlight
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    el.blur();
+
+    // Force any remaining focused elements to blur
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
 }
 
 // Setup editable fields on page load
@@ -1410,21 +1424,39 @@ function toggleExplanationMode() {
             const visible = loanDefContent.style.display === "block";
             loanDefContent.style.display = visible ? "none" : "block";
             loanDefHeader.textContent = visible ? "Loan Definitions ▼" : "Loan Definitions ▲";
+            loanDefHeader.style.color = visible ? "#0b2345" : "#2563eb";
             loanDefHeader.blur();
+
+            // Scroll to top when closing
+            if (visible) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         };
 
         paymentDefHeader.onclick = () => {
             const visible = paymentDefContent.style.display === "block";
             paymentDefContent.style.display = visible ? "none" : "block";
             paymentDefHeader.textContent = visible ? "Monthly Payment Definitions ▼" : "Monthly Payment Definitions ▲";
+            paymentDefHeader.style.color = visible ? "#0b2345" : "#2563eb";
             paymentDefHeader.blur();
+
+            // Scroll to top when closing
+            if (visible) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         };
 
         incomeDefHeader.onclick = () => {
             const visible = incomeDefContent.style.display === "block";
             incomeDefContent.style.display = visible ? "none" : "block";
             incomeDefHeader.textContent = visible ? "Income Definitions ▼" : "Income Definitions ▲";
+            incomeDefHeader.style.color = visible ? "#0b2345" : "#2563eb";
             incomeDefHeader.blur();
+
+            // Scroll to top when closing
+            if (visible) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         };
 
         // Hide back button in explanation mode
