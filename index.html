@@ -1182,13 +1182,26 @@ function setupEditableFields() {
                 calculate(key);
                 formatEditableInput(this, type, key);
 
-                // Blur to remove focus (which removes blue color via CSS)
+                // Blur to remove focus
                 this.blur();
 
-                // Scroll to top
-                setTimeout(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 0);
+                // Force "hover" state to move away by focusing on the h1 title briefly
+                const h1 = document.querySelector('h1');
+                if (h1) {
+                    // Make h1 focusable temporarily
+                    h1.setAttribute('tabindex', '-1');
+                    h1.focus();
+
+                    // Immediately blur it and move to body
+                    setTimeout(() => {
+                        h1.blur();
+                        document.body.focus();
+                        h1.removeAttribute('tabindex');
+
+                        // Scroll to top
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 0);
+                }
 
             } else if (e.key === "Escape") {
                 e.preventDefault();
