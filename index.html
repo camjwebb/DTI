@@ -1181,14 +1181,22 @@ function finishEditing(el, key, type) {
 
     formatEditableInput(el, type, key);
 
-    // Scroll to top and blur the element to remove any focus/highlight
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Blur the element and move focus to body to clear the blue outline
     el.blur();
 
-    // Force any remaining focused elements to blur
-    if (document.activeElement) {
-        document.activeElement.blur();
-    }
+    // Force focus to body to ensure no element retains focus
+    document.body.focus();
+
+    // Small delay to ensure blur completes before scrolling
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Ensure nothing is focused after scroll
+        if (document.activeElement && document.activeElement !== document.body) {
+            document.activeElement.blur();
+            document.body.focus();
+        }
+    }, 50);
 }
 
 // Setup editable fields on page load
