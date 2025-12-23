@@ -209,6 +209,12 @@
         .summary-value[contenteditable="true"].no-outline:focus {
             outline: none !important;
         }
+        /* Override focus outline on mobile after editing */
+        @media screen and (max-width: 420px) {
+            .summary-value[contenteditable="true"].editing-done:focus {
+                outline: none !important;
+            }
+        }
         .summary-value[contenteditable="true"] {
             -webkit-tap-highlight-color: transparent;
         }
@@ -235,6 +241,12 @@
         }
         .dropdown-row span:last-child[contenteditable="true"].no-outline:focus {
             outline: none !important;
+        }
+        /* Override focus outline on mobile after editing */
+        @media screen and (max-width: 420px) {
+            .dropdown-row span:last-child[contenteditable="true"].editing-done:focus {
+                outline: none !important;
+            }
         }
         .dropdown-row span:last-child[contenteditable="true"] {
             -webkit-tap-highlight-color: transparent;
@@ -1156,6 +1168,10 @@ function setupEditableFields() {
                 e.preventDefault();
                 isEnterPressed = true;
 
+                // Add editing-done class IMMEDIATELY before any processing
+                this.classList.add('editing-done');
+                this.classList.add('no-outline');
+
                 // Process the edit first
                 let text = this.textContent.replace(/[^0-9.-]+/g, "");
                 let numValue = parseFloat(text) || 0;
@@ -1180,16 +1196,13 @@ function setupEditableFields() {
                 calculate(key);
                 formatEditableInput(this, type, key);
 
-                // CRITICAL: Add no-outline AFTER formatting (which can refocus element)
-                this.classList.add('no-outline');
-
                 // Force immediate style recalculation
                 void this.offsetHeight;
 
                 // Aggressive blur sequence
                 const element = this;
 
-                // Blur immediately after style is applied
+                // Blur immediately
                 element.blur();
 
                 // Clear selection to prevent any visual artifacts
@@ -1204,9 +1217,10 @@ function setupEditableFields() {
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                    // Remove no-outline class after scroll completes
+                    // Remove classes after scroll completes
                     setTimeout(() => {
                         element.classList.remove('no-outline');
+                        element.classList.remove('editing-done');
                     }, 300);
                 }, 0);
 
