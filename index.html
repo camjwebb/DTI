@@ -196,8 +196,10 @@
         .summary-value[data-edit] {
             font-style: italic;
         }
-        .summary-value[data-edit]:hover {
-            color: #2563eb;
+        @media (hover: hover) and (pointer: fine) {
+            .summary-value[data-edit]:hover {
+                color: #2563eb;
+            }
         }
         .summary-value[contenteditable="true"] {
             border-radius: 4px;
@@ -224,8 +226,10 @@
         .dropdown-row span:last-child {
             font-style: italic;
         }
-        .dropdown-row span:last-child:hover {
-            color: #2563eb;
+        @media (hover: hover) and (pointer: fine) {
+            .dropdown-row span:last-child:hover {
+                color: #2563eb;
+            }
         }
         .dropdown-row span:last-child[contenteditable="true"] {
             border-radius: 4px;
