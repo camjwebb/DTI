@@ -26,20 +26,27 @@
         body {
             font-family: Arial, Helvetica, sans-serif;
             background: #f4f6fb;
-            padding: 10px;
+            padding: 8px;
             color: #1a1a1a;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-y: scroll;
-            user-select: text;
+            user-select: none;
         }
         input {
             cursor: text;
+            user-select: text;
         }
         button {
             cursor: pointer;
             user-select: none;
+        }
+        .step {
+            user-select: text;
+        }
+        .section-box {
+            user-select: text;
         }
         .container {
             max-width: 420px;
@@ -57,7 +64,7 @@
             font-size: 6vw;
             font-weight: 800;
             text-align: center;
-            margin-bottom: 1vh;
+            margin-bottom: 0.5vh;
             color: #0b2345;
         }
         @media (min-width: 420px) {
@@ -66,14 +73,24 @@
             }
         }
         h2 {
-            font-size: 22px;
+            font-size: 4.2vw;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+        }
+        @media (min-width: 420px) {
+            h2 {
+                font-size: 19px;
+            }
         }
         p.sub {
             color: #6a7485;
-            font-size: 14px;
-            margin-bottom: 20px;
+            font-size: 4.2vw;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 420px) {
+            p.sub {
+                font-size: 19px;
+            }
         }
 
         /* ============================================================
@@ -81,7 +98,7 @@
            ============================================================ */
         .step {
             background: white;
-            padding: 22px;
+            padding: 18px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
             display: none;
@@ -92,19 +109,19 @@
            INPUTS
            ============================================================ */
         label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: block;
         }
         input[type="text"] {
             width: 100%;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-radius: 10px;
             border: 1px solid #d6d9e0;
             font-size: 16px;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         @media (min-width: 420px) {
             input[type="text"] {
@@ -116,12 +133,12 @@
         }
         button {
             width: 100%;
-            padding: 2vh;
+            padding: 1.5vh;
             font-size: 4vw;
             font-weight: 700;
             border-radius: 10px;
             border: none;
-            margin-top: 1vh;
+            margin-top: 0.5vh;
             cursor: pointer;
         }
         @media (min-width: 420px) {
@@ -145,27 +162,27 @@
 
         .section-box {
             background: white;
-            padding: 3vw;
+            padding: 2.5vw;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            margin-top: 1vh;
+            margin-top: 0.5vh;
             overflow-y: auto;
         }
         @media (min-width: 420px) {
             .section-box {
-                padding: 20px;
+                padding: 16px;
             }
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin: 1.5vh 0;
-            font-size: 4vw;
+            margin: 1.2vh 0;
+            font-size: 4.2vw;
         }
         @media (min-width: 420px) {
             .summary-row {
-                font-size: 18px;
+                font-size: 19px;
                 margin: 12px 0;
             }
         }
@@ -249,44 +266,44 @@
         hr {
             border: 0;
             border-bottom: 1px solid #e1e4ea;
-            margin: 1.5vh 0;
+            margin: 1vh 0;
         }
 
         /* Dropdown */
         .dropdown {
-            margin-top: 1vh;
+            margin-top: 0.5vh;
         }
         .dropdown button {
             background: #e9edf5;
             color: #0b2345;
             padding: 2vh 2vw;
-            font-size: 3.5vw;
+            font-size: 3.8vw;
             -webkit-tap-highlight-color: transparent;
         }
         @media (min-width: 420px) {
             .dropdown button {
-                padding: 10px;
-                font-size: 15px;
+                padding: 12px;
+                font-size: 16px;
             }
         }
         .dropdown-content {
             display: none;
-            padding: 12px;
+            padding: 10px;
             background: #f9fbff;
             border-radius: 10px;
-            margin-top: 8px;
+            margin-top: 6px;
             border: 1px solid #d9dee8;
         }
         .dropdown-row {
             display: flex;
             justify-content: space-between;
-            margin: 1vh 0;
-            font-size: 3.5vw;
+            margin: 1.2vh 0;
+            font-size: 3.8vw;
         }
         @media (min-width: 420px) {
             .dropdown-row {
-                font-size: 15px;
-                margin: 6px 0;
+                font-size: 16px;
+                margin: 8px 0;
             }
         }
 
@@ -295,9 +312,9 @@
         footer {
             text-align: center;
             font-size: 2.5vw;
-            margin-top: 1vh;
+            margin-top: 0.5vh;
             color: #6a7485;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         footer a {
             color: #2563eb;
@@ -335,19 +352,46 @@
             background: #d9dee8;
         }
 
+        /* Refresh Button */
+        .refresh-button {
+            position: absolute;
+            top: -10px;
+            transform: translateY(-50%);
+            left: 0;
+            background: #e9edf5;
+            color: #0b2345;
+            padding: 6px 10px;
+            font-size: 16px;
+            border-radius: 9px;
+            border: none;
+            cursor: pointer;
+            width: auto;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .refresh-button:hover {
+            background: #d9dee8;
+        }
+
         /* Big number container for positioning */
         .big-number-container {
             position: relative;
             display: block;
             width: 100%;
-            min-height: 5px;
+            min-height: 3px;
+            margin-top: 12px;
+            margin-bottom: 12px;
         }
 
         /* Explanation text styles */
         .explanation-text {
-            font-size: 14px;
+            font-size: 15px;
             color: #4a5568;
-            line-height: 1.6;
+            line-height: 1.7;
         }
         .explanation-label {
             font-weight: 700;
@@ -369,9 +413,9 @@
             margin-bottom: 24px;
         }
         .explanation-section h3 {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 700;
-            margin-top: 12px;
+            margin-top: 14px;
             margin-bottom: 0;
             color: #0b2345;
             cursor: pointer;
@@ -405,10 +449,8 @@
         STEP 1: INCOME
         ============================================================ -->
     <div id="step1" class="step active">
-        <h2>Your Monthly Income</h2>
-        <p class="sub">Enter your income before taxes and deductions</p>
+        <p class="sub">Enter your monthly gross income before taxes and deductions.</p>
 
-        <label>Monthly Income (before taxes)</label>
         <input id="incomeInput" type="text" inputmode="numeric" placeholder="$5,000">
 
         <button class="btn-primary" id="goToStep2">Continue</button>
@@ -418,10 +460,8 @@
         STEP 2: DEBT
         ============================================================ -->
     <div id="step2" class="step">
-        <h2>Your Monthly Debt Payments</h2>
-        <p class="sub">Car loans, students loans, credit cards, other debts.</p>
+        <p class="sub">Enter your monthly debts - anything that would show up on a credit report (car loans, student loans, credit cards, etc.)</p>
 
-        <label>Total Monthly Debt</label>
         <input id="debtInput" type="text" inputmode="numeric" placeholder="$500">
 
         <button class="btn-primary" id="goToSummary">What can I afford?</button>
@@ -435,6 +475,7 @@
 
         <!-- Definitions Button Container -->
         <div class="big-number-container">
+            <button class="refresh-button" id="refreshButton">&#x21bb;</button>
             <button class="explanation-toggle" id="explanationToggle">Definitions</button>
         </div>
 
@@ -480,6 +521,9 @@
                     <div class="dropdown-row">
                         <span>Homeowners Association Dues  </span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
                     </div>
+                    <div style="text-align: center; margin-top: 10px; font-size: 12px; font-style: italic; color: #9ca3af;">
+                        Monthly payment breakdown are estimates only
+                    </div>
                 </div>
             </div>
 
@@ -512,11 +556,15 @@
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Debt-to-Income Ratio  </span>
-                <span class="summary-value" data-edit="dtiPct" data-type="percent">36</span>
+                <span class="summary-label">Desired Monthly Payment  </span>
+                <span class="summary-value" data-edit="desiredPayment" data-type="currency">0</span>
             </div>
 
-            <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
+            <div style="padding-left: 20px; margin-top: -10px; margin-bottom: 10px;">
+                <span id="budgetStatus" style="font-size: 12px; font-weight: 600; font-style: italic;"></span>
+            </div>
+
+            <div style="text-align: center; margin-top: 10px; font-size: 13px; font-style: italic; color: #6a7485;">
                 Click any italicized number to customize
             </div>
 
@@ -543,14 +591,24 @@
 let state = {
     grossIncome: 0,
     monthlyDebt: 0,
-    dtiPct: 36,
+    desiredPayment: 0,  // User's desired monthly payment for housing
     downPct: 5,
     interestRate: 6,
     termYears: 30,
     taxes: 0,  // Will be calculated dynamically as 0.5% of purchase price per year
     hoi: 130,
     hoa: 0,
-    pmi: 0  // Will be calculated dynamically
+    pmi: 0,  // Will be calculated dynamically
+    // Track if user manually edited these fields
+    taxesManuallySet: false,
+    pmiManuallySet: false
+};
+
+// Store original values when user first enters calculator
+let originalValues = {
+    income: 0,
+    debt: 0,
+    desiredPayment: 0
 };
 
 /* UTILITIES */
@@ -651,11 +709,20 @@ function goToSummaryFunc() {
     } else {
         state.monthlyDebt = debtValue;
     }
-    
+
     if (!state.grossIncome) {
         state.grossIncome = parseCurrency(incomeInput.value);
     }
-    
+
+    // Set initial desired payment at 36% DTI
+    state.desiredPayment = (state.grossIncome * 0.36) - state.monthlyDebt;
+    if (state.desiredPayment < 0) state.desiredPayment = 0;
+
+    // Save original values when first entering calculator
+    originalValues.income = state.grossIncome;
+    originalValues.debt = state.monthlyDebt;
+    originalValues.desiredPayment = state.desiredPayment;
+
     calculate();
     step2.classList.remove("active");
     summary.classList.add("active");
@@ -671,7 +738,7 @@ function goToSummaryFunc() {
             else if (key === "downPct") numValue = state.downPct;
             else if (key === "interestRate") numValue = state.interestRate;
             else if (key === "termYears") numValue = state.termYears;
-            else if (key === "dtiPct") numValue = state.dtiPct;
+            else if (key === "desiredPayment") numValue = state.desiredPayment;
             else if (key === "taxes") numValue = state.taxes;
             else if (key === "hoi") numValue = state.hoi;
             else if (key === "hoa") numValue = state.hoa;
@@ -685,8 +752,6 @@ function goToSummaryFunc() {
                     el.textContent = parseFloat(numValue).toFixed(1) + "%";
                 } else if (key === "interestRate") {
                     el.textContent = parseFloat(numValue).toFixed(3) + "%";
-                } else if (key === "dtiPct") {
-                    el.textContent = parseFloat(numValue).toFixed(2) + "%";
                 } else {
                     el.textContent = parseFloat(numValue).toFixed(2) + "%";
                 }
@@ -719,8 +784,37 @@ const observer2 = new MutationObserver(() => {
 observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
 
 backBtn.onclick = () => {
+    // Reset manual override flags when going back
+    state.taxesManuallySet = false;
+    state.pmiManuallySet = false;
+
     summary.classList.remove("active");
     step2.classList.add("active");
+};
+
+// Refresh button - reset calculator to original state from pages 1 and 2
+const refreshButton = document.getElementById('refreshButton');
+refreshButton.onclick = () => {
+    // Restore original income and debt from pages 1 and 2
+    state.grossIncome = originalValues.income;
+    state.monthlyDebt = originalValues.debt;
+
+    // Reset calculator parameters to defaults
+    state.downPct = 5;
+    state.interestRate = 6;
+    state.termYears = 30;
+    state.hoi = 130;
+    state.hoa = 0;
+    state.taxesManuallySet = false;
+    state.pmiManuallySet = false;
+
+    // Reset desired payment to original (36% DTI calculation)
+    state.desiredPayment = originalValues.desiredPayment;
+
+    // Recalculate everything
+    calculate();
+
+    refreshButton.blur();
 };
 
 /* ============================================================
@@ -736,10 +830,6 @@ function calculate(editedField = null) {
     let purchase = 0;
     let downPayment = 0;
 
-    // First pass: Calculate loan amount to determine PMI
-    // This is needed because PMI depends on loan amount, but loan depends on PMI
-    // We'll use an iterative approach
-
     const r = (state.interestRate / 100) / 12;
     const n = state.termYears * 12;
     const down = state.downPct / 100;
@@ -747,98 +837,48 @@ function calculate(editedField = null) {
     // Determine if PMI should be applied (down payment < 20%)
     const needsPMI = state.downPct < 20;
 
-    // If user edited DTI, calculate monthly payment from DTI
-    if (editedField === 'dtiPct') {
-        const dti = state.dtiPct / 100;
-        monthlyPayment = (g * dti) - debt;
+    // Mark when user manually edits taxes or PMI
+    if (editedField === 'taxes') {
+        state.taxesManuallySet = true;
+    }
+    if (editedField === 'pmi') {
+        state.pmiManuallySet = true;
+    }
+
+    // If user edited any breakdown item (pi, taxes, hoi, hoa, pmi), keep monthly payment constant
+    if (editedField === 'pi' || editedField === 'taxes' || editedField === 'hoi' || editedField === 'hoa' || editedField === 'pmi') {
+        // Keep the total monthly payment constant using desired payment
+        monthlyPayment = state.desiredPayment;
         if (monthlyPayment < 0) monthlyPayment = 0;
 
-        // Iteratively calculate loan, taxes, and PMI
-        let tempLoan = 0;
-        let tempPMI = 0;
-        let tempTaxes = 0;
-        let tempPurchase = 0;
+        // Calculate PI by subtracting other costs from total monthly payment
+        const otherCosts = state.taxes + state.hoi + state.hoa + state.pmi;
+        PI = monthlyPayment - otherCosts;
+        if (PI < 0) PI = 0;
 
-        for (let i = 0; i < 10; i++) {  // Iterate to converge
-            const monthlyOther = tempTaxes + state.hoi + state.hoa + tempPMI;
-            PI = monthlyPayment - monthlyOther;
-            if (PI < 0) PI = 0;
-
-            if (PI > 0 && r > 0) {
-                tempLoan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
-            } else if (PI > 0) {
-                tempLoan = PI * n;
-            }
-            if (!isFinite(tempLoan) || tempLoan < 0) tempLoan = 0;
-
-            // Calculate purchase price from loan
-            tempPurchase = tempLoan > 0 ? tempLoan / (1 - down) : 0;
-
-            // Calculate taxes as 0.5% of purchase price per year, divided by 12 for monthly
-            tempTaxes = tempPurchase * 0.005 / 12;
-
-            // Calculate PMI as 0.35% of loan amount per year, divided by 12 for monthly
-            tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
+        // Calculate loan from PI
+        if (PI > 0 && r > 0) {
+            loan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
+        } else if (PI > 0) {
+            loan = PI * n;
         }
+        if (!isFinite(loan) || loan < 0) loan = 0;
 
-        loan = tempLoan;
-        purchase = tempPurchase;
-        state.taxes = tempTaxes;
-        state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
-    }
-    // If user edited any breakdown item (pi, taxes, hoi, hoa, pmi), keep DTI constant and adjust purchase price
-    else if (editedField === 'pi' || editedField === 'taxes' || editedField === 'hoi' || editedField === 'hoa' || editedField === 'pmi') {
-        // Keep DTI constant, work backwards to find affordable purchase price
-        const dti = state.dtiPct / 100;
-        const maxMonthlyPayment = (g * dti) - debt;
-        if (maxMonthlyPayment < 0) {
-            monthlyPayment = 0;
-            PI = 0;
-            loan = 0;
-            purchase = 0;
-        } else {
-            // Calculate what PI can be given the other costs
-            const otherCosts = state.taxes + state.hoi + state.hoa + state.pmi;
-            PI = maxMonthlyPayment - otherCosts;
-            if (PI < 0) PI = 0;
-
-            // Calculate loan from PI
-            if (PI > 0 && r > 0) {
-                loan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
-            } else if (PI > 0) {
-                loan = PI * n;
-            }
-            if (!isFinite(loan) || loan < 0) loan = 0;
-
-            // Calculate purchase price
-            purchase = loan > 0 ? loan / (1 - down) : 0;
-
-            // If taxes were manually edited, keep that value, otherwise recalculate
-            if (editedField !== 'taxes') {
-                state.taxes = purchase * 0.005 / 12;
-            }
-
-            // If PMI was manually edited, keep that value, otherwise recalculate
-            if (editedField !== 'pmi') {
-                state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
-            }
-
-            monthlyPayment = PI + state.taxes + state.hoi + state.hoa + state.pmi;
-        }
+        // Calculate purchase price
+        purchase = loan > 0 ? loan / (1 - down) : 0;
 
         // Store PI in state
         state.pi = PI;
     }
-    // For all other fields (downPct, grossIncome, monthlyDebt, interestRate, termYears), keep DTI constant
-    else {
-        const dti = state.dtiPct / 100;
-        monthlyPayment = (g * dti) - debt;
+    // If user edited desired payment
+    else if (editedField === 'desiredPayment') {
+        monthlyPayment = state.desiredPayment;
         if (monthlyPayment < 0) monthlyPayment = 0;
 
-        // Iteratively calculate loan, taxes, and PMI
+        // Iteratively calculate loan, taxes, and PMI (unless manually set)
         let tempLoan = 0;
-        let tempPMI = 0;
-        let tempTaxes = 0;
+        let tempPMI = state.pmiManuallySet ? state.pmi : 0;
+        let tempTaxes = state.taxesManuallySet ? state.taxes : 0;
         let tempPurchase = 0;
 
         for (let i = 0; i < 10; i++) {
@@ -856,16 +896,73 @@ function calculate(editedField = null) {
             // Calculate purchase price from loan
             tempPurchase = tempLoan > 0 ? tempLoan / (1 - down) : 0;
 
-            // Calculate taxes as 0.5% of purchase price per year, divided by 12 for monthly
-            tempTaxes = tempPurchase * 0.005 / 12;
+            // Calculate taxes only if not manually set
+            if (!state.taxesManuallySet) {
+                tempTaxes = tempPurchase * 0.005 / 12;
+            }
 
-            tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
+            // Calculate PMI only if not manually set
+            if (!state.pmiManuallySet) {
+                tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
+            }
         }
 
         loan = tempLoan;
         purchase = tempPurchase;
-        state.taxes = tempTaxes;
-        state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
+        if (!state.taxesManuallySet) {
+            state.taxes = tempTaxes;
+        }
+        if (!state.pmiManuallySet) {
+            state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
+        }
+        state.pi = PI;
+    }
+    // For all other fields (downPct, grossIncome, monthlyDebt, interestRate, termYears), use desired payment
+    else {
+        monthlyPayment = state.desiredPayment;
+        if (monthlyPayment < 0) monthlyPayment = 0;
+
+        // Iteratively calculate loan, taxes, and PMI (unless manually set)
+        let tempLoan = 0;
+        let tempPMI = state.pmiManuallySet ? state.pmi : 0;
+        let tempTaxes = state.taxesManuallySet ? state.taxes : 0;
+        let tempPurchase = 0;
+
+        for (let i = 0; i < 10; i++) {
+            const monthlyOther = tempTaxes + state.hoi + state.hoa + tempPMI;
+            PI = monthlyPayment - monthlyOther;
+            if (PI < 0) PI = 0;
+
+            if (PI > 0 && r > 0) {
+                tempLoan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
+            } else if (PI > 0) {
+                tempLoan = PI * n;
+            }
+            if (!isFinite(tempLoan) || tempLoan < 0) tempLoan = 0;
+
+            // Calculate purchase price from loan
+            tempPurchase = tempLoan > 0 ? tempLoan / (1 - down) : 0;
+
+            // Calculate taxes only if not manually set
+            if (!state.taxesManuallySet) {
+                tempTaxes = tempPurchase * 0.005 / 12;
+            }
+
+            // Calculate PMI only if not manually set
+            if (!state.pmiManuallySet) {
+                tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
+            }
+        }
+
+        loan = tempLoan;
+        purchase = tempPurchase;
+        if (!state.taxesManuallySet) {
+            state.taxes = tempTaxes;
+        }
+        if (!state.pmiManuallySet) {
+            state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
+        }
+        state.pi = PI;
     }
 
     // Store PI in state for reference
@@ -874,11 +971,48 @@ function calculate(editedField = null) {
     // Calculate down payment from purchase price (purchase already calculated in branches above)
     downPayment = purchase * down;
 
+    // Calculate overall DTI for budget status
+    const totalDebt = monthlyPayment + debt;
+    const overallDTI = g > 0 ? (totalDebt / g) * 100 : 0;
+
     // Display
     purchaseBig.textContent = "$" + Math.round(purchase).toLocaleString();
     sumLoan.textContent = "$" + Math.round(loan).toLocaleString();
     sumDown.textContent = "$" + Math.round(downPayment).toLocaleString();
     sumMonthly.textContent = "$" + Math.round(monthlyPayment).toLocaleString();
+
+    // Update budget status display
+    const budgetStatusEl = document.getElementById('budgetStatus');
+    if (budgetStatusEl) {
+        let statusText = '';
+        let statusColor = '';
+
+        if (overallDTI <= 28) {
+            statusText = 'Excellent Budget';
+            statusColor = '#1e40af'; // Dark Blue
+        } else if (overallDTI <= 36) {
+            statusText = 'Recommended Budget';
+            statusColor = '#15803d'; // Dark Green
+        } else if (overallDTI <= 43) {
+            statusText = 'Tight Budget';
+            statusColor = '#ea580c'; // Orange
+        } else if (overallDTI <= 50) {
+            statusText = 'Risky Budget';
+            statusColor = '#b91c1c'; // Dark Red
+        } else if (overallDTI <= 56.99) {
+            statusText = 'Very Risky Budget';
+            statusColor = '#b91c1c'; // Dark Red
+        } else {
+            statusText = 'Impossible Budget';
+            statusColor = '#b91c1c'; // Dark Red
+        }
+
+        // Add DTI percentage in parentheses
+        statusText += ` (${overallDTI.toFixed(2)}% DTI)`;
+
+        budgetStatusEl.textContent = statusText;
+        budgetStatusEl.style.color = statusColor;
+    }
 
     // Update breakdown if not currently editing
     if (document.activeElement.id !== 'bdPI') {
@@ -903,7 +1037,7 @@ function calculate(editedField = null) {
     updateEditableValue('[data-edit="downPct"]', state.downPct, "percent", "downPct");
     updateEditableValue('[data-edit="interestRate"]', state.interestRate, "percent", "interestRate");
     updateEditableValue('[data-edit="termYears"]', state.termYears, "years", "termYears");
-    updateEditableValue('[data-edit="dtiPct"]', state.dtiPct, "percent", "dtiPct");
+    updateEditableValue('[data-edit="desiredPayment"]', state.desiredPayment, "currency", "desiredPayment");
 }
 
 // Helper function to update editable values without disrupting editing
@@ -1180,7 +1314,12 @@ function setupEditableFields() {
                 else if (key === "termYears" && numValue > 50) numValue = 50;
                 else if (key === "grossIncome" && numValue > 99999) numValue = 99999;
                 else if (key === "monthlyDebt" && numValue > 99999) numValue = 99999;
-                else if (key === "dtiPct" && numValue > 56.99) numValue = 56.99;
+                else if (key === "desiredPayment") {
+                    // Cap desired payment at 100% DTI
+                    const maxPayment = (state.grossIncome * 1.00) - state.monthlyDebt;
+                    if (numValue > maxPayment) numValue = Math.max(0, maxPayment);
+                    if (numValue > 99999) numValue = 99999;
+                }
 
                 state[key] = numValue;
                 calculate(key);
@@ -1236,7 +1375,12 @@ function finishEditing(el, key, type) {
     else if (key === "termYears" && numValue > 50) numValue = 50;
     else if (key === "grossIncome" && numValue > 99999) numValue = 99999;
     else if (key === "monthlyDebt" && numValue > 99999) numValue = 99999;
-    else if (key === "dtiPct" && numValue > 56.99) numValue = 56.99;
+    else if (key === "desiredPayment") {
+        // Cap desired payment at 100% DTI
+        const maxPayment = (state.grossIncome * 1.00) - state.monthlyDebt;
+        if (numValue > maxPayment) numValue = Math.max(0, maxPayment);
+        if (numValue > 99999) numValue = 99999;
+    }
 
     state[key] = numValue;
 
@@ -1356,6 +1500,10 @@ const explanations = {
         label: "Monthly Debt",
         text: "All recurring monthly debt payments including car loans and credit cards."
     },
+    desiredPayment: {
+        label: "Desired Monthly Payment",
+        text: "The total amount you want to spend on housing each month."
+    },
     dti: {
         label: "Debt-to-Income Ratio",
         text: "The percentage of your monthly income used to pay all debts."
@@ -1368,11 +1516,15 @@ function toggleExplanationMode() {
     const dropdown = document.querySelector('.dropdown');
     const editNote = document.querySelector('[style*="text-align: center"]');
     const backBtn = document.getElementById('backBtn');
+    const refreshBtn = document.getElementById('refreshButton');
 
     if (explanationMode) {
         button.textContent = 'Calculator';
         button.style.top = '-10px';
         button.style.transform = 'translateY(-50%)';
+
+        // Hide refresh button in explanation mode
+        if (refreshBtn) refreshBtn.style.display = 'none';
 
         // Get all summary rows in the section-box
         const sectionBox = document.querySelector('.section-box');
@@ -1478,6 +1630,9 @@ function toggleExplanationMode() {
                         <span class="explanation-text"><span class="explanation-label">${explanations.monthlyDebt.label}</span> - ${explanations.monthlyDebt.text}</span>
                     </div>
                     <div class="summary-row" style="padding-left: 20px;">
+                        <span class="explanation-text"><span class="explanation-label">${explanations.desiredPayment.label}</span> - ${explanations.desiredPayment.text}</span>
+                    </div>
+                    <div class="summary-row" style="padding-left: 20px;">
                         <span class="explanation-text"><span class="explanation-label">${explanations.dti.label}</span> - ${explanations.dti.text}</span>
                     </div>
                 </div>
@@ -1539,6 +1694,9 @@ function toggleExplanationMode() {
         button.style.top = '-10px';
         button.style.transform = 'translateY(-50%)';
 
+        // Show refresh button when leaving explanation mode
+        if (refreshBtn) refreshBtn.style.display = 'flex';
+
         // Restore numbers - rebuild the entire section-box with original structure
         const sectionBox = document.querySelector('.section-box');
         sectionBox.innerHTML = `
@@ -1581,6 +1739,9 @@ function toggleExplanationMode() {
                     <div class="dropdown-row">
                         <span>Homeowners Association Dues  </span><span id="bdHOA" class="summary-value" data-edit="hoa" data-type="currency">0</span>
                     </div>
+                    <div style="text-align: center; margin-top: 10px; font-size: 12px; font-style: italic; color: #9ca3af;">
+                        Monthly payment breakdown are estimates only
+                    </div>
                 </div>
             </div>
 
@@ -1613,8 +1774,12 @@ function toggleExplanationMode() {
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Debt-to-Income Ratio  </span>
-                <span class="summary-value" data-edit="dtiPct" data-type="percent">36</span>
+                <span class="summary-label">Desired Monthly Payment  </span>
+                <span class="summary-value" data-edit="desiredPayment" data-type="currency">0</span>
+            </div>
+
+            <div style="padding-left: 20px; margin-top: -10px; margin-bottom: 10px;">
+                <span id="budgetStatus" style="font-size: 12px; font-weight: 600; font-style: italic;"></span>
             </div>
 
             <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
