@@ -845,8 +845,38 @@ function calculate(editedField = null) {
         state.pmiManuallySet = true;
     }
 
-    // If user edited any breakdown item (pi, taxes, hoi, hoa, pmi), keep monthly payment constant
-    if (editedField === 'pi' || editedField === 'taxes' || editedField === 'hoi' || editedField === 'hoa' || editedField === 'pmi') {
+    // If user edited PI specifically, recalculate monthly payment and desired payment
+    if (editedField === 'pi') {
+        PI = state.pi;
+        if (PI < 0) PI = 0;
+
+        // Calculate loan from PI
+        if (PI > 0 && r > 0) {
+            loan = (PI * (Math.pow(1 + r, n) - 1)) / (r * Math.pow(1 + r, n));
+        } else if (PI > 0) {
+            loan = PI * n;
+        }
+        if (!isFinite(loan) || loan < 0) loan = 0;
+
+        // Calculate purchase price
+        purchase = loan > 0 ? loan / (1 - down) : 0;
+
+        // Recalculate taxes and PMI based on new purchase price (unless manually set)
+        if (!state.taxesManuallySet) {
+            state.taxes = purchase * 0.005 / 12;
+        }
+        if (!state.pmiManuallySet) {
+            state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
+        }
+
+        // Calculate new total monthly payment
+        monthlyPayment = PI + state.taxes + state.hoi + state.hoa + state.pmi;
+
+        // Update desired payment to match the new monthly payment
+        state.desiredPayment = monthlyPayment;
+    }
+    // If user edited other breakdown items (taxes, hoi, hoa, pmi), keep monthly payment constant
+    else if (editedField === 'taxes' || editedField === 'hoi' || editedField === 'hoa' || editedField === 'pmi') {
         // Keep the total monthly payment constant using desired payment
         monthlyPayment = state.desiredPayment;
         if (monthlyPayment < 0) monthlyPayment = 0;
