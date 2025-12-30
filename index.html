@@ -330,7 +330,7 @@
         /* Explanation Mode Button */
         .explanation-toggle {
             position: absolute;
-            top: -10px;
+            top: 5px;
             transform: translateY(-50%);
             right: 0;
             background: #e9edf5;
@@ -427,7 +427,7 @@
             color: #2563eb;
         }
         .explanation-section h3:first-of-type {
-            margin-top: 12px;
+            margin-top: 28px;
         }
         .explanation-section h3:not(:first-of-type) {
             margin-top: 20px;
@@ -451,7 +451,7 @@
     <div id="step1" class="step active">
         <p class="sub">Enter your monthly gross income before taxes and deductions.</p>
 
-        <input id="incomeInput" type="text" inputmode="numeric" placeholder="$5,000">
+        <input id="incomeInput" type="text" inputmode="numeric" placeholder="$6,000">
 
         <button class="btn-primary" id="goToStep2">Continue</button>
     </div>
@@ -460,11 +460,11 @@
         STEP 2: DEBT
         ============================================================ -->
     <div id="step2" class="step">
-        <p class="sub">Enter your total minimum monthly debt payments - anything that would show up on a credit report (minimum car loan, student loan, credit card, etc. payments)</p>
+        <p class="sub">Enter your total monthly debt payments - the minimum amounts you pay each month on car loans, student loans, credit cards, etc.</p>
 
         <input id="debtInput" type="text" inputmode="numeric" placeholder="$500">
 
-        <button class="btn-primary" id="goToSummary">What can I afford?</button>
+        <button class="btn-primary" id="goToSummary">See My Options</button>
         <button class="btn-secondary" id="backTo1">Back</button>
     </div>
 
@@ -473,9 +473,11 @@
         ============================================================ -->
     <div id="summary" class="step">
 
-        <!-- Definitions Button Container -->
-        <div class="big-number-container">
-            <button class="refresh-button" id="refreshButton">&#x21bb;</button>
+        <!-- Click/Tap instruction and Definitions Button -->
+        <div style="position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div id="clickTapText" style="font-size: 13px; font-style: italic; color: #6a7485;">
+                Click/Tap any italicized number to customize
+            </div>
             <button class="explanation-toggle" id="explanationToggle">Definitions</button>
         </div>
 
@@ -556,7 +558,7 @@
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Desired Monthly Payment  </span>
+                <span class="summary-label">Target Monthly Payment  </span>
                 <span class="summary-value" data-edit="desiredPayment" data-type="currency">0</span>
             </div>
 
@@ -564,13 +566,15 @@
                 <span id="budgetStatus" style="font-size: 12px; font-weight: 600; font-style: italic;"></span>
             </div>
 
-            <div style="text-align: center; margin-top: 10px; font-size: 13px; font-style: italic; color: #6a7485;">
-                Click any italicized number to customize
+            <!-- SUMMARY DROPDOWN -->
+            <div class="dropdown">
+                <button id="toggleSummary">Summarize the numbers ▼</button>
+                <div id="summaryBox" class="dropdown-content">
+                    <div id="budgetSummaryText" style="font-size: 15px; line-height: 1.6; color: #1a1a1a; padding: 5px 0;"></div>
+                </div>
             </div>
 
         </div>
-
-        <button class="btn-secondary" id="backBtn">Back</button>
 
         <!-- FOOTER -->
         <footer>
@@ -593,14 +597,15 @@ let state = {
     monthlyDebt: 0,
     desiredPayment: 0,  // User's desired monthly payment for housing
     downPct: 5,
-    interestRate: 6,
+    interestRate: 6.125,
     termYears: 30,
     taxes: 0,  // Will be calculated dynamically as 0.5% of purchase price per year
-    hoi: 130,
+    hoi: 0,  // Will be calculated dynamically as 0.35% of purchase price per year
     hoa: 0,
     pmi: 0,  // Will be calculated dynamically
     // Track if user manually edited these fields
     taxesManuallySet: false,
+    hoiManuallySet: false,
     pmiManuallySet: false
 };
 
@@ -659,10 +664,10 @@ function formatEditableInput(el, type, key) {
    ============================================================ */
 function goToStep2Func() {
     const v = parseCurrency(incomeInput.value);
-    // If no value entered, use default of 5000
+    // If no value entered, use default of 6000
     if (v <= 0) {
-        state.grossIncome = 5000;
-        incomeInput.value = "$5,000";
+        state.grossIncome = 6000;
+        incomeInput.value = "$6,000";
     } else {
         state.grossIncome = v;
     }
@@ -783,40 +788,6 @@ const observer2 = new MutationObserver(() => {
 });
 observer2.observe(step2, { attributes: true, attributeFilter: ["class"] });
 
-backBtn.onclick = () => {
-    // Reset manual override flags when going back
-    state.taxesManuallySet = false;
-    state.pmiManuallySet = false;
-
-    summary.classList.remove("active");
-    step2.classList.add("active");
-};
-
-// Refresh button - reset calculator to original state from pages 1 and 2
-const refreshButton = document.getElementById('refreshButton');
-refreshButton.onclick = () => {
-    // Restore original income and debt from pages 1 and 2
-    state.grossIncome = originalValues.income;
-    state.monthlyDebt = originalValues.debt;
-
-    // Reset calculator parameters to defaults
-    state.downPct = 5;
-    state.interestRate = 6;
-    state.termYears = 30;
-    state.hoi = 130;
-    state.hoa = 0;
-    state.taxesManuallySet = false;
-    state.pmiManuallySet = false;
-
-    // Reset desired payment to original (36% DTI calculation)
-    state.desiredPayment = originalValues.desiredPayment;
-
-    // Recalculate everything
-    calculate();
-
-    refreshButton.blur();
-};
-
 /* ============================================================
    CALCULATION
    ============================================================ */
@@ -837,9 +808,12 @@ function calculate(editedField = null) {
     // Determine if PMI should be applied (down payment < 20%)
     const needsPMI = state.downPct < 20;
 
-    // Mark when user manually edits taxes or PMI
+    // Mark when user manually edits taxes, HOI, or PMI
     if (editedField === 'taxes') {
         state.taxesManuallySet = true;
+    }
+    if (editedField === 'hoi') {
+        state.hoiManuallySet = true;
     }
     if (editedField === 'pmi') {
         state.pmiManuallySet = true;
@@ -861,9 +835,12 @@ function calculate(editedField = null) {
         // Calculate purchase price
         purchase = loan > 0 ? loan / (1 - down) : 0;
 
-        // Recalculate taxes and PMI based on new purchase price (unless manually set)
+        // Recalculate taxes, HOI, and PMI based on new purchase price (unless manually set)
         if (!state.taxesManuallySet) {
             state.taxes = purchase * 0.005 / 12;
+        }
+        if (!state.hoiManuallySet) {
+            state.hoi = purchase * 0.0035 / 12;
         }
         if (!state.pmiManuallySet) {
             state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
@@ -905,14 +882,15 @@ function calculate(editedField = null) {
         monthlyPayment = state.desiredPayment;
         if (monthlyPayment < 0) monthlyPayment = 0;
 
-        // Iteratively calculate loan, taxes, and PMI (unless manually set)
+        // Iteratively calculate loan, taxes, HOI, and PMI (unless manually set)
         let tempLoan = 0;
         let tempPMI = state.pmiManuallySet ? state.pmi : 0;
         let tempTaxes = state.taxesManuallySet ? state.taxes : 0;
+        let tempHOI = state.hoiManuallySet ? state.hoi : 0;
         let tempPurchase = 0;
 
         for (let i = 0; i < 10; i++) {
-            const monthlyOther = tempTaxes + state.hoi + state.hoa + tempPMI;
+            const monthlyOther = tempTaxes + tempHOI + state.hoa + tempPMI;
             PI = monthlyPayment - monthlyOther;
             if (PI < 0) PI = 0;
 
@@ -931,6 +909,11 @@ function calculate(editedField = null) {
                 tempTaxes = tempPurchase * 0.005 / 12;
             }
 
+            // Calculate HOI only if not manually set
+            if (!state.hoiManuallySet) {
+                tempHOI = tempPurchase * 0.0035 / 12;
+            }
+
             // Calculate PMI only if not manually set
             if (!state.pmiManuallySet) {
                 tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
@@ -941,6 +924,9 @@ function calculate(editedField = null) {
         purchase = tempPurchase;
         if (!state.taxesManuallySet) {
             state.taxes = tempTaxes;
+        }
+        if (!state.hoiManuallySet) {
+            state.hoi = tempHOI;
         }
         if (!state.pmiManuallySet) {
             state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
@@ -952,14 +938,15 @@ function calculate(editedField = null) {
         monthlyPayment = state.desiredPayment;
         if (monthlyPayment < 0) monthlyPayment = 0;
 
-        // Iteratively calculate loan, taxes, and PMI (unless manually set)
+        // Iteratively calculate loan, taxes, HOI, and PMI (unless manually set)
         let tempLoan = 0;
         let tempPMI = state.pmiManuallySet ? state.pmi : 0;
         let tempTaxes = state.taxesManuallySet ? state.taxes : 0;
+        let tempHOI = state.hoiManuallySet ? state.hoi : 0;
         let tempPurchase = 0;
 
         for (let i = 0; i < 10; i++) {
-            const monthlyOther = tempTaxes + state.hoi + state.hoa + tempPMI;
+            const monthlyOther = tempTaxes + tempHOI + state.hoa + tempPMI;
             PI = monthlyPayment - monthlyOther;
             if (PI < 0) PI = 0;
 
@@ -978,6 +965,11 @@ function calculate(editedField = null) {
                 tempTaxes = tempPurchase * 0.005 / 12;
             }
 
+            // Calculate HOI only if not manually set
+            if (!state.hoiManuallySet) {
+                tempHOI = tempPurchase * 0.0035 / 12;
+            }
+
             // Calculate PMI only if not manually set
             if (!state.pmiManuallySet) {
                 tempPMI = needsPMI ? (tempLoan * 0.0035 / 12) : 0;
@@ -988,6 +980,9 @@ function calculate(editedField = null) {
         purchase = tempPurchase;
         if (!state.taxesManuallySet) {
             state.taxes = tempTaxes;
+        }
+        if (!state.hoiManuallySet) {
+            state.hoi = tempHOI;
         }
         if (!state.pmiManuallySet) {
             state.pmi = needsPMI ? (loan * 0.0035 / 12) : 0;
@@ -1033,7 +1028,7 @@ function calculate(editedField = null) {
             statusText = 'Very Risky Budget';
             statusColor = '#b91c1c'; // Dark Red
         } else {
-            statusText = 'Impossible Budget';
+            statusText = 'Very Risky Budget';
             statusColor = '#b91c1c'; // Dark Red
         }
 
@@ -1042,6 +1037,44 @@ function calculate(editedField = null) {
 
         budgetStatusEl.textContent = statusText;
         budgetStatusEl.style.color = statusColor;
+    }
+
+    // Update budget summary text in dropdown
+    const budgetSummaryTextEl = document.getElementById('budgetSummaryText');
+    if (budgetSummaryTextEl) {
+        // Calculate remaining monthly budget
+        const remainingBudget = g - totalDebt;
+
+        // Determine status text and color based on DTI
+        let statusText = '';
+        let statusColor = '';
+        let statusPrefix = 'This is';
+
+        if (overallDTI <= 28) {
+            statusText = 'an excellent budget';
+            statusColor = '#1e40af'; // Dark Blue
+        } else if (overallDTI <= 36) {
+            statusText = 'a recommended budget';
+            statusColor = '#15803d'; // Dark Green
+        } else if (overallDTI <= 43) {
+            statusText = 'a tight budget';
+            statusColor = '#ea580c'; // Orange
+            statusPrefix = 'This could be';
+        } else if (overallDTI <= 50) {
+            statusText = 'a risky budget';
+            statusColor = '#b91c1c'; // Dark Red
+            statusPrefix = 'This could be';
+        } else if (overallDTI <= 56.99) {
+            statusText = 'a very risky budget';
+            statusColor = '#b91c1c'; // Dark Red
+            statusPrefix = 'This could be';
+        } else {
+            statusText = 'a very risky budget';
+            statusColor = '#b91c1c'; // Dark Red
+        }
+
+        // Build the dynamic summary text with HTML for bold numbers and colored status
+        budgetSummaryTextEl.innerHTML = `With a monthly income of <strong>$${Math.round(g).toLocaleString()}</strong>, debt of <strong>$${Math.round(debt).toLocaleString()}</strong>, and a housing payment of <strong>$${Math.round(monthlyPayment).toLocaleString()}</strong>, your debt-to-income ratio is <strong>${overallDTI.toFixed(2)}%</strong>.<br><br>This budget supports a <strong>$${Math.round(purchase).toLocaleString()}</strong> home with a <strong>${state.downPct.toFixed(1)}%</strong> (<strong>$${Math.round(downPayment).toLocaleString()}</strong>) down payment, <strong>${state.interestRate.toFixed(3)}%</strong> interest rate, and a <strong>${state.termYears}</strong> year term.<br><br>This leaves <strong>$${Math.round(remainingBudget).toLocaleString()}</strong> per month for taxes, other expenses, and savings.<br><br><strong style="font-style: italic; color: ${statusColor};">${statusPrefix} ${statusText}.</strong>`;
     }
 
     // Update breakdown if not currently editing
@@ -1103,11 +1136,19 @@ toggleBreakdown.onclick = () => {
         ? "Show Payment Breakdown ▼"
         : "Hide Payment Breakdown ▲";
     toggleBreakdown.blur();
+};
 
-    // Scroll to top when closing the dropdown
-    if (visible) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+/* ============================================================
+   SUMMARY DROPDOWN
+   ============================================================ */
+toggleSummary.onclick = () => {
+    const box = summaryBox;
+    const visible = box.style.display === "block";
+    box.style.display = visible ? "none" : "block";
+    toggleSummary.textContent = visible
+        ? "Summarize the numbers ▼"
+        : "Summarize the numbers ▲";
+    toggleSummary.blur();
 };
 
 /* ============================================================
@@ -1358,23 +1399,8 @@ function setupEditableFields() {
                 // Blur to remove focus
                 this.blur();
 
-                // Force "hover" state to move away by focusing on the h1 title briefly
-                const h1 = document.querySelector('h1');
-                if (h1) {
-                    // Make h1 focusable temporarily
-                    h1.setAttribute('tabindex', '-1');
-                    h1.focus();
-
-                    // Immediately blur it and move to body
-                    setTimeout(() => {
-                        h1.blur();
-                        document.body.focus();
-                        h1.removeAttribute('tabindex');
-
-                        // Scroll to top
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }, 0);
-                }
+                // Force focus to body to ensure no element retains focus
+                document.body.focus();
 
             } else if (e.key === "Escape") {
                 e.preventDefault();
@@ -1424,17 +1450,6 @@ function finishEditing(el, key, type) {
 
     // Force focus to body to ensure no element retains focus
     document.body.focus();
-
-    // Small delay to ensure blur completes before scrolling
-    setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Ensure nothing is focused after scroll
-        if (document.activeElement && document.activeElement !== document.body) {
-            document.activeElement.blur();
-            document.body.focus();
-        }
-    }, 50);
 }
 
 // Setup editable fields on page load
@@ -1546,18 +1561,28 @@ function toggleExplanationMode() {
     const dropdown = document.querySelector('.dropdown');
     const editNote = document.querySelector('[style*="text-align: center"]');
     const backBtn = document.getElementById('backBtn');
-    const refreshBtn = document.getElementById('refreshButton');
+    const clickTapText = document.getElementById('clickTapText');
 
     if (explanationMode) {
         button.textContent = 'Calculator';
-        button.style.top = '-10px';
+        button.style.top = '5px';
         button.style.transform = 'translateY(-50%)';
 
-        // Hide refresh button in explanation mode
-        if (refreshBtn) refreshBtn.style.display = 'none';
+        // Hide Click/Tap instruction text in explanation mode
+        if (clickTapText) {
+            clickTapText.style.display = 'none';
+            // Also hide the parent container's margin since only the button remains
+            const parentContainer = clickTapText.parentElement;
+            if (parentContainer) {
+                parentContainer.style.marginBottom = '0';
+            }
+        }
 
         // Get all summary rows in the section-box
         const sectionBox = document.querySelector('.section-box');
+
+        // Add top margin to move content down 32px
+        sectionBox.style.marginTop = '32px';
 
         // Calculate current values for display
         const g = state.grossIncome;
@@ -1683,11 +1708,6 @@ function toggleExplanationMode() {
             loanDefHeader.textContent = visible ? "Loan Definitions ▼" : "Loan Definitions ▲";
             loanDefHeader.style.color = visible ? "#0b2345" : "#2563eb";
             loanDefHeader.blur();
-
-            // Scroll to top when closing
-            if (visible) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
         };
 
         paymentDefHeader.onclick = () => {
@@ -1696,11 +1716,6 @@ function toggleExplanationMode() {
             paymentDefHeader.textContent = visible ? "Monthly Payment Definitions ▼" : "Monthly Payment Definitions ▲";
             paymentDefHeader.style.color = visible ? "#0b2345" : "#2563eb";
             paymentDefHeader.blur();
-
-            // Scroll to top when closing
-            if (visible) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
         };
 
         incomeDefHeader.onclick = () => {
@@ -1709,26 +1724,28 @@ function toggleExplanationMode() {
             incomeDefHeader.textContent = visible ? "Income Definitions ▼" : "Income Definitions ▲";
             incomeDefHeader.style.color = visible ? "#0b2345" : "#2563eb";
             incomeDefHeader.blur();
-
-            // Scroll to top when closing
-            if (visible) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
         };
-
-        // Hide back button in explanation mode
-        backBtn.style.display = 'none';
 
     } else {
         button.textContent = 'Definitions';
-        button.style.top = '-10px';
+        button.style.top = '5px';
         button.style.transform = 'translateY(-50%)';
 
-        // Show refresh button when leaving explanation mode
-        if (refreshBtn) refreshBtn.style.display = 'flex';
+        // Show Click/Tap instruction text when leaving explanation mode
+        if (clickTapText) {
+            clickTapText.style.display = 'block';
+            // Restore the parent container's margin
+            const parentContainer = clickTapText.parentElement;
+            if (parentContainer) {
+                parentContainer.style.marginBottom = '15px';
+            }
+        }
 
         // Restore numbers - rebuild the entire section-box with original structure
         const sectionBox = document.querySelector('.section-box');
+
+        // Restore section-box top margin
+        sectionBox.style.marginTop = '';
         sectionBox.innerHTML = `
             <div class="summary-row">
                 <span class="summary-label">Purchase Price</span>
@@ -1804,7 +1821,7 @@ function toggleExplanationMode() {
             </div>
 
             <div class="summary-row">
-                <span class="summary-label">Desired Monthly Payment  </span>
+                <span class="summary-label">Target Monthly Payment  </span>
                 <span class="summary-value" data-edit="desiredPayment" data-type="currency">0</span>
             </div>
 
@@ -1812,8 +1829,12 @@ function toggleExplanationMode() {
                 <span id="budgetStatus" style="font-size: 12px; font-weight: 600; font-style: italic;"></span>
             </div>
 
-            <div style="text-align: center; margin-top: 12px; font-size: 12px; font-style: italic; color: #6a7485;">
-                Tap any italicized number to customize
+            <!-- SUMMARY DROPDOWN -->
+            <div class="dropdown">
+                <button id="toggleSummary">Summarize the numbers ▼</button>
+                <div id="summaryBox" class="dropdown-content">
+                    <div id="budgetSummaryText" style="font-size: 15px; line-height: 1.6; color: #1a1a1a; padding: 5px 0;"></div>
+                </div>
             </div>
         `;
 
@@ -1828,9 +1849,16 @@ function toggleExplanationMode() {
                 : "Hide Payment Breakdown ▲";
         };
 
-        // Restore back button
-        backBtn.textContent = 'Back';
-        backBtn.style.display = '';
+        // Setup summary dropdown functionality
+        const toggleSummaryBtn = document.getElementById('toggleSummary');
+        const summaryBox = document.getElementById('summaryBox');
+        toggleSummaryBtn.onclick = () => {
+            const visible = summaryBox.style.display === "block";
+            summaryBox.style.display = visible ? "none" : "block";
+            toggleSummaryBtn.textContent = visible
+                ? "Summarize the numbers ▼"
+                : "Summarize the numbers ▲";
+        };
 
         // Restore numbers
         calculate();
